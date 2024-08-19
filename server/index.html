@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input type="file" name="" id="image">
+    <div id="heatmap">
+        
+    </div>
+</body>
+<script>
+    const image = document.getElementById("image")
+    const heatmap = document.getElementById("heatmap")
+    image.addEventListener("change", async (e) => {
+        if(e.target.files[0]) {
+            try {
+                const formData = new FormData()
+                formData.append("file", e.target.files[0])
+                const response = await fetch("http://127.0.0.1:8000/upload", {method: "post", body: formData})
+                const img = await response.blob()
+                const imgURL = URL.createObjectURL(img)
+                const image = document.createElement("img")
+                image.src = imgURL
+                heatmap.appendChild(image)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+    })
+</script>
+</html>
