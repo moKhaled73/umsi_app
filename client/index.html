@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InsightGaze</title>
+    <link rel="icon" href="images/photo_2024-08-19_04-44-35.jpg">
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@200;300;400;500;600;700;800&#038;display=swap"
+        rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+        integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Render All Elements Normally -->
+    <link rel="stylesheet" href="normalize.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!--start header-->
+    <header>
+        <div class="img">
+            <img src="images/logo.jpg" alt="InsightGaze">
+            <span>InsightGaze</span>
+
+        </div>
+        <ul>
+            <li class="active">
+                <i class="fa-solid fa-house" style="color: #c77529;"></i> <a href="#">home</a>
+            </li>
+            <li class="active"><i class="fa-solid fa-users-gear" style="color: #c77529;"></i><a href="#">Services</a>
+            </li>
+            <li class="active"><i class="fa-regular fa-address-card" style="color: #c77529;"></i><a href="#">about</a>
+            </li>
+            <li class="active"><i id="conn" class="fa-solid fa-phone-volume" style="color: #c77529;"></i><a
+                    href="#">contact</a>
+            </li>
+            <li class="menu" onclick=showLinks()><a href="#"><svg xmlns="http://www.w3.org/2000/svg" height="24px"
+                        viewBox="0 -960 960 960" width="24px" fill="#5f6368">
+                        <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z" />
+                    </svg>
+                </a></li>
+        </ul>
+        <ul class="links">
+            <li onclick="hideLinks()"><a href="#"><svg xmlns="http://www.w3.org/2000/svg" height="26px"
+                        viewBox="0 -960 960 960" width="26px" fill="#5f6368">
+                        <path
+                            d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+                    </svg></a></li>
+            <li class="link"><a href="#">home</a></li>
+            <li class="link"><a href="#">Services</a></li>
+            <li class="link"><a href="#">about</a></li>
+            <li class="link"><a href="#">contact</a></li>
+            <button class="btn1">log in</button>
+            <button class="btn">sign up</button>
+        </ul>
+        <div class="buttons">
+            <button class="btn1">log in</button>
+            <button class="btn">sign up</button>
+        </div>
+
+    </header>
+    <!--end header-->
+    <section class="home">
+        <div class="container">
+
+            <div class="info">
+                <h1 class="head">Gain Insights with Heatmap Analytics on Photos.Unlock the Power of Visual Attention
+                    with Our AI-Driven Heatmaps</h1>
+                <p>Understand where viewers focus their attention on your images instantly. Optimize your visuals before
+                    sharing them to ensure maximum engagement. Improve your content strategy by fine-tuning photos based
+                    on actual user interaction, platform requirements, and more.</p>
+
+            </div>
+
+            <img src="images/home.jpg" alt="">
+        </div>
+        <div class="btns"><button class="btnhome">Try it for free
+            </button>
+            <button class="btnhome2"><i class="fa-regular fa-circle-play" style="color: #c77529;"></i><span>View
+                    Demo</span>
+            </button>
+        </div>
+    </section>
+    <script src="main.js"></script>
+</body>
+
+</html>
