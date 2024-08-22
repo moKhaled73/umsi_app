@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InsightGaze</title>
+    <link rel="icon" href="images/photo_2024-08-19_04-44-35.jpg" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@200;300;400;500;600;700;800&#038;display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+      integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <!-- Render All Elements Normally -->
+    <link rel="stylesheet" href="../normalize.css" />
+    <link rel="stylesheet" href="heatmap.css" />
+  </head>
+
+  <body>
+    <!--start header-->
+    <header>
+      <div class="img">
+        <img src="../images/logo.jpg" alt="InsightGaze" />
+        <span>InsightGaze</span>
+      </div>
+      <div class="links">
+        <div class="close" onclick="hideLinks()">
+          <a href="#"><i class="fa-regular fa-circle-xmark"></i></a>
+        </div>
+        <ul>
+          <li class="active">
+            <i class="fa-solid fa-house" style="color: #c77529"></i>
+            <a href="#">home</a>
+          </li>
+          <li class="active">
+            <i class="fa-solid fa-users-gear" style="color: #c77529"></i
+            ><a href="#">Services</a>
+          </li>
+          <li class="active">
+            <i class="fa-regular fa-address-card" style="color: #c77529"></i
+            ><a href="#">about</a>
+          </li>
+          <li class="active">
+            <i
+              id="conn"
+              class="fa-solid fa-phone-volume"
+              style="color: #c77529"
+            ></i
+            ><a href="#">contact</a>
+          </li>
+        </ul>
+        <div class="buttons">
+          <button class="login">log in</button>
+          <button class="signup">sign up</button>
+        </div>
+      </div>
+      <div class="menu" onclick="showLinks()">
+        <a href="#"><i class="fa-solid fa-bars"></i> </a>
+      </div>
+    </header>
+    <!--end header-->
+    <!-- start model -->
+    <main>
+      <ul class="tabs">
+        <li class="active">
+          <span>heatmap 3s</span
+          ><i
+            data-modelname="heatmap3s"
+            class="help fa-regular fa-circle-question"
+          ></i>
+        </li>
+        <li>
+          <span>heatmap 7s</span
+          ><i
+            data-modelname="heatamp7s"
+            class="help fa-regular fa-circle-question"
+          ></i>
+        </li>
+        <li>
+          <span>scanpath</span
+          ><i
+            data-modelname="scanpath"
+            class="help fa-regular fa-circle-question"
+          ></i>
+        </li>
+      </ul>
+      <section class="model">
+        <div class="image-container">
+          <div class="upload-file">
+            <input type="file" id="image-file" />
+            <p>click to select or drag and drop image</p>
+          </div>
+          <i class="close fa-solid fa-circle-xmark"></i>
+        </div>
+        <div class="heatmap">
+          <p>the result heatmap</p>
+        </div>
+      </section>
+      <button class="generate">generate</button>
+
+      <div class="dialog"></div>
+    </main>
+    <!-- end model  -->
+    <script src="heatmap.js"></script>
+  </body>
+</html>
