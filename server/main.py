@@ -96,7 +96,7 @@ app.add_middleware(
 )
 
 
-@app.post("/upload")
+@app.post("/heatmap3s/upload")
 async def upload_image(file: UploadFile = File(...)):
     
     image_bytes = await file.read()

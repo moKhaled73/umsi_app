@@ -66,6 +66,48 @@
       </div>
     </header>
     <!--end header-->
+    <!-- start model -->
+    <main>
+      <ul class="tabs">
+        <li class="active">
+          <span>heatmap 3s</span
+          ><i
+            data-modelname="heatmap3s"
+            class="help fa-regular fa-circle-question"
+          ></i>
+        </li>
+        <li>
+          <span>heatmap 7s</span
+          ><i
+            data-modelname="heatamp7s"
+            class="help fa-regular fa-circle-question"
+          ></i>
+        </li>
+        <li>
+          <span>scanpath</span
+          ><i
+            data-modelname="scanpath"
+            class="help fa-regular fa-circle-question"
+          ></i>
+        </li>
+      </ul>
+      <section class="model">
+        <div class="image-container">
+          <div class="upload-file">
+            <input type="file" id="image-file" />
+            <p>click to select or drag and drop image</p>
+          </div>
+          <i class="close fa-solid fa-circle-xmark"></i>
+        </div>
+        <div class="heatmap">
+          <p>the result heatmap</p>
+        </div>
+      </section>
+      <button class="generate">generate</button>
+
+      <div class="dialog"></div>
+    </main>
+    <!-- end model  -->
     <script src="heatmap.js"></script>
   </body>
 </html>
