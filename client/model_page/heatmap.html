@@ -19,7 +19,6 @@
       referrerpolicy="no-referrer"
     />
     <!-- Render All Elements Normally -->
-    <link rel="stylesheet" href="../normalize.css" />
     <link rel="stylesheet" href="heatmap.css" />
   </head>
 
@@ -27,7 +26,7 @@
     <!--start header-->
     <header>
       <div class="img">
-        <img src="../images/logo.jpg" alt="InsightGaze" />
+        <img src="../images/logo-removebg-preview.png" alt="InsightGaze" />
         <span>InsightGaze</span>
       </div>
       <div class="links">
@@ -92,18 +91,21 @@
         </li>
       </ul>
       <section class="model">
-        <div class="image-container">
+        <div class="error">
+          <i class="fa-solid fa-exclamation"></i>
+          <p class="content"></p>
+        </div>
+        <div class="image">
           <div class="upload-file">
             <input type="file" id="image-file" />
             <p>click to select or drag and drop image</p>
           </div>
+          <div class="image-container"></div>
           <i class="close fa-solid fa-circle-xmark"></i>
         </div>
-        <div class="heatmap">
-          <p>the result heatmap</p>
-        </div>
+
+        <button class="generate">Generate</button>
       </section>
-      <button class="generate">generate</button>
 
       <div class="dialog"></div>
     </main>

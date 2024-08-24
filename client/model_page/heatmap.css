@@ -1,4 +1,6 @@
-* {
+*,
+*::after,
+*::before {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -30,7 +32,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 25px;
+  padding: 10px 20px;
   max-width: 100%;
 }
 
@@ -38,7 +40,6 @@ header {
   width: 70px;
   display: flex;
   align-items: center;
-  margin-right: 68px;
 
   img {
     width: 100%;
@@ -54,7 +55,8 @@ header {
 .links {
   position: relative;
   display: flex;
-  gap: 100px;
+  justify-content: space-between;
+  flex: 0.75;
   .close {
     display: none;
   }
@@ -131,7 +133,7 @@ header {
 
 @media (max-width: 1200px) {
   .links {
-    gap: 50px;
+    flex: 0.8;
     .buttons {
       gap: 4px !important;
     }
@@ -199,11 +201,12 @@ header {
     display: block;
   }
 }
+/*end header*/
 
 main {
   min-height: calc(100vh - 85px);
   background-color: #eee;
-  padding: 10px 25px;
+  padding: 10px 20px;
   .tabs {
     display: flex;
     gap: 10px;
@@ -234,28 +237,60 @@ main {
   }
 }
 
-main .generate {
-  margin-top: 10px;
-  background-color: var(--main-color);
-  border: none;
-  outline: none;
-  color: #f0f0f0;
-  padding: 7px 18px;
-  font-size: 24px;
-  font-weight: bold;
-  border-radius: 5px;
-  display: block;
-  cursor: pointer;
+@media (max-width: 512px) {
+  main {
+    .tabs {
+      gap: 5px;
+      border-bottom: 1px solid var(--main-color);
+
+      li {
+        border: 1px solid var(--main-color);
+        border-bottom: none;
+        font-size: 12px;
+        span {
+          padding: 3px 6px;
+        }
+        i {
+          padding-right: 3px;
+        }
+      }
+    }
+  }
 }
 
 .model {
   display: flex;
+  flex-direction: column;
   gap: 10px;
-  height: 480px;
 
-  .image-container {
+  .error {
+    padding: 6px 12px;
+    background-color: #ff4d4f;
+    color: white;
+    font-size: 18px;
+    display: none;
+    align-items: center;
+    gap: 5px;
+    i {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 25px;
+      height: 25px;
+      border: 1px solid white;
+      border-radius: 50%;
+      text-align: center;
+      font-size: 14px;
+    }
+    p {
+      background-color: inherit;
+      color: inherit;
+    }
+  }
+
+  .image {
+    flex: 1;
     border: 2px dashed var(--main-color);
-    flex-basis: 50%;
     border-radius: 10px;
     position: relative;
     display: flex;
@@ -263,6 +298,8 @@ main .generate {
     align-items: center;
     overflow: hidden;
     background-color: white;
+    flex-basis: 512px;
+
     .upload-file {
       width: 100%;
       height: 100%;
@@ -286,11 +323,32 @@ main .generate {
         color: #777;
       }
     }
-    img {
-      object-fit: contain;
-      width: 100%;
-      height: 100%;
+
+    .image-container {
+      width: 512px;
+      height: 512px;
+      display: none;
+      position: relative;
+
+      .original-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        object-fit: contain;
+        width: 100%;
+        height: 100%;
+      }
+      .heatmap-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        animation: fadeIn 5s forwards;
+      }
     }
+
     .close {
       display: none;
       position: absolute;
@@ -302,28 +360,45 @@ main .generate {
       cursor: pointer;
     }
   }
+}
 
-  .heatmap {
-    border: 2px dashed var(--main-color);
-    flex-basis: 50%;
-    border-radius: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: white;
-
-    p {
-      font-size: 25px;
-      font-style: italic;
-      font-weight: bold;
-      color: #777;
-    }
-    img {
+@media (max-width: 512px) {
+  .model {
+    .image {
       width: 100%;
-      height: 100%;
-      object-fit: contain;
+      .upload-file {
+        p {
+          font-size: 16px;
+        }
+      }
+      .image-container {
+        width: 100%;
+        height: 100%;
+      }
     }
   }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.5; /* Final opacity of 0.5 */
+  }
+}
+
+main .generate {
+  background-color: var(--main-color);
+  border: none;
+  outline: none;
+  color: #f0f0f0;
+  padding: 7px 18px;
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: 5px;
+  display: block;
+  cursor: pointer;
 }
 
 .dialog {

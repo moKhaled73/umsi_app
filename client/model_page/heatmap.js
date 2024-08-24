@@ -1,13 +1,17 @@
 const links = document.querySelector(".links");
 const tabs = document.querySelectorAll(".tabs li span");
-const imageContainer = document.querySelector(".image-container");
-const heatmap = document.querySelector(".heatmap");
-const uploadFile = document.querySelector(".image-container .upload-file");
-const closeBtn = document.querySelector(".image-container .close");
+
+const error = document.querySelector(".model .error");
+const image = document.querySelector(".image");
+const uploadFile = document.querySelector(".image .upload-file");
+const imageContainer = document.querySelector(".image .image-container");
+const closeBtn = document.querySelector(".image .close");
 const imageFile = document.getElementById("image-file");
+const generateBtn = document.querySelector("main .generate");
+let selectedImage = null;
+
 const helps = document.querySelectorAll(".tabs li .help");
 const dialog = document.querySelector(".dialog");
-const generateBtn = document.querySelector("main .generate");
 
 const HEATMAP3S_API_URL = "http://127.0.0.1:8000/heatmap3s/upload";
 const HEATMAP7S_API_URL = "http://127.0.0.1:8000/heatmap7s/upload";
@@ -48,29 +52,33 @@ function activeTabs() {
 activeTabs();
 
 // add original image
-function addImage(imageFile) {
+function addImage() {
   uploadFile.style.display = "none";
-  const image = document.createElement("img");
-  image.src = URL.createObjectURL(imageFile);
-  image.className = "image";
-  imageContainer.appendChild(image);
+  imageContainer.style.display = "block";
+  const originalImage = document.createElement("img");
+  originalImage.className = "original-image";
+  originalImage.src = URL.createObjectURL(selectedImage);
+  imageContainer.appendChild(originalImage);
+  image.appendChild(imageContainer);
   closeBtn.style.display = "block";
 }
 
 // remove original image
 function removeImage() {
   closeBtn.addEventListener("click", (e) => {
-    const image = document.querySelector(".image-container .image");
-    image.remove();
+    imageContainer.innerHTML = "";
+    imageContainer.style.display = "none";
     closeBtn.style.display = "none";
     uploadFile.style.display = "flex";
   });
 }
+removeImage();
 
-async function generateHeatmap(imageFile) {
+async function generateHeatmap() {
+  generateBtn.innerHTML = "Generating...";
   try {
     const formData = new FormData();
-    formData.append("file", imageFile);
+    formData.append("file", selectedImage);
     const res = await fetch(HEATMAP3S_API_URL, {
       method: "post",
       body: formData,
@@ -78,25 +86,43 @@ async function generateHeatmap(imageFile) {
 
     const blob = await res.blob();
     const imageUrl = URL.createObjectURL(blob);
-    heatmap.innerHTML = "";
-    const img = document.createElement("img");
-    img.src = imageUrl;
-    heatmap.appendChild(img);
+    const heatmapImage = document.createElement("img");
+    heatmapImage.className = "heatmap-image";
+    heatmapImage.src = imageUrl;
+    imageContainer.appendChild(heatmapImage);
+    generateBtn.innerHTML = "Generate";
   } catch (error) {
+    generateBtn.innerHTML = "Generate";
     console.log(error);
   }
 }
 
-function ulpoadImage() {
-  imageFile.addEventListener("change", (e) => {
-    addImage(e.target.files[0]);
-    generateBtn.addEventListener("click", () => {
-      generateHeatmap(e.target.files[0]);
-    });
-  });
-}
-removeImage();
-ulpoadImage();
+imageFile.addEventListener("change", (e) => {
+  selectedImage = e.target.files[0];
+  if (selectedImage.type.split("/")[0] !== "image") {
+    error.style.display = "flex";
+    error.lastElementChild.innerHTML = "images only allowed";
+    setTimeout(() => {
+      error.style.display = "none";
+      error.lastElementChild.innerHTML = "";
+    }, 3000);
+  } else {
+    addImage();
+  }
+});
+
+generateBtn.addEventListener("click", () => {
+  if (imageContainer.innerHTML === "") {
+    error.style.display = "flex";
+    error.lastElementChild.innerHTML = "please upload an image first";
+    setTimeout(() => {
+      error.style.display = "none";
+      error.lastElementChild.innerHTML = "";
+    }, 3000);
+  } else {
+    generateHeatmap();
+  }
+});
 
 function showHelp() {
   helps.forEach((help) =>
@@ -125,3 +151,16 @@ function showHelp() {
   );
 }
 showHelp();
+
+function adjustHeight() {
+  if (image.offsetWidth < 512) {
+    image.style.flexBasis = `${image.offsetWidth}px`;
+    console.log(image.offsetHeight);
+  }
+}
+
+// Run on page load
+window.onload = adjustHeight;
+
+// Run on window resize
+window.onresize = adjustHeight;
