@@ -122,7 +122,7 @@ async def upload_image(file: UploadFile = File(...)):
     preds_map = preds[0][0]
 
     # Step 4: Resize the preds_map to match the original image size
-    heatmap = cv2.resize(preds_map, (img.shape[1], img.shape[0]))
+    heatmap = cv2.resize(preds_map, (512, 512))
 
     # Step 5: Normalize and apply colormap to the heatmap
     heatmap = np.maximum(heatmap, 0)  # Ensure all values are positive
@@ -130,12 +130,21 @@ async def upload_image(file: UploadFile = File(...)):
     heatmap = np.uint8(255 * heatmap)  # Scale to [0, 255]
     heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
 
-    # Step 6: Overlay the heatmap on the original image
-    overlay_img = cv2.addWeighted(img, 0.6, heatmap, 0.4, 0)
+    # # Step 6: Overlay the heatmap on the original image
+    # overlay_img = cv2.addWeighted(img, 0.6, heatmap, 0.4, 0)
+
+    # Define the opacity level (alpha), where 1.0 is fully opaque and 0.0 is fully transparent
+    alpha = 1  # 50% opacity
+
+    # Create a blank white image with the same size as the original image
+    background = np.ones_like(heatmap, dtype=np.uint8) * 255
+
+    # Blend the image with the white background using the alpha value
+    blended_image = cv2.addWeighted(heatmap, alpha, background, 1 - alpha, 0)
 
     
     # Step 6: Convert the result to bytes and return it
-    _, img_encoded = cv2.imencode('.png', overlay_img)
+    _, img_encoded = cv2.imencode('.png', blended_image)
     img_bytes = io.BytesIO(img_encoded.tobytes())
     
     return StreamingResponse(img_bytes, media_type="image/png")
