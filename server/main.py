@@ -22,7 +22,7 @@ import cv2
 
 
 # Load the model when the script is initialized
-weightsPath = 'umsi-3s.h5'
+weightsPath = 'models/umsi-3s.h5'
 model = tf.keras.models.load_model(weightsPath)
 
 def padding(img, shape_r, shape_c, channels=3):
