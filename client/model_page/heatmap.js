@@ -61,11 +61,12 @@ function addImage() {
 }
 
 // remove original image and heatmap
-closeBtn.addEventListener("click", (e) => {
+closeBtn.addEventListener("click", () => {
   imageContainer.innerHTML = "";
   imageContainer.style.display = "none";
   closeBtn.style.display = "none";
   uploadFile.style.display = "flex";
+  imageFile.value = "";
 });
 
 // call api and display heatmap
@@ -119,6 +120,7 @@ generateBtn.addEventListener("click", () => {
     imageContainer.style.display = "none";
     closeBtn.style.display = "none";
     uploadFile.style.display = "flex";
+    imageFile.value = "";
     generateBtn.innerHTML = "Generate";
   } else {
     generateHeatmap();
@@ -153,7 +155,9 @@ helps.forEach((help) =>
 function adjustHeight() {
   if (image.offsetWidth < 512) {
     image.style.flexBasis = `${image.offsetWidth}px`;
-    console.log(image.offsetHeight);
+  } else {
+    image.style.flexBasis = "512px";
+    image.style.width = "512px";
   }
 }
 
