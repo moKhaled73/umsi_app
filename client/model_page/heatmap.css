@@ -261,6 +261,8 @@ main {
 .model {
   display: flex;
   flex-direction: column;
+  width: 512px;
+  margin: 0 auto;
   gap: 10px;
 
   .error {
@@ -364,6 +366,7 @@ main {
 
 @media (max-width: 512px) {
   .model {
+    width: 100%;
     .image {
       width: 100%;
       .upload-file {

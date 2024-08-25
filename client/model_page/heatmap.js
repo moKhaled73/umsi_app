@@ -41,15 +41,12 @@ function hideLinks() {
 }
 
 // active tabs
-function activeTabs() {
-  tabs.forEach((tab) => {
-    tab.addEventListener("click", (e) => {
-      tabs.forEach((tab) => tab.parentNode.classList.remove("active"));
-      e.target.parentNode.classList.add("active");
-    });
+tabs.forEach((tab) => {
+  tab.addEventListener("click", (e) => {
+    tabs.forEach((tab) => tab.parentNode.classList.remove("active"));
+    e.target.parentNode.classList.add("active");
   });
-}
-activeTabs();
+});
 
 // add original image
 function addImage() {
@@ -63,17 +60,15 @@ function addImage() {
   closeBtn.style.display = "block";
 }
 
-// remove original image
-function removeImage() {
-  closeBtn.addEventListener("click", (e) => {
-    imageContainer.innerHTML = "";
-    imageContainer.style.display = "none";
-    closeBtn.style.display = "none";
-    uploadFile.style.display = "flex";
-  });
-}
-removeImage();
+// remove original image and heatmap
+closeBtn.addEventListener("click", (e) => {
+  imageContainer.innerHTML = "";
+  imageContainer.style.display = "none";
+  closeBtn.style.display = "none";
+  uploadFile.style.display = "flex";
+});
 
+// call api and display heatmap
 async function generateHeatmap() {
   generateBtn.innerHTML = "Generating...";
   try {
@@ -90,22 +85,27 @@ async function generateHeatmap() {
     heatmapImage.className = "heatmap-image";
     heatmapImage.src = imageUrl;
     imageContainer.appendChild(heatmapImage);
-    generateBtn.innerHTML = "Generate";
+    generateBtn.innerHTML = "Try again";
   } catch (error) {
     generateBtn.innerHTML = "Generate";
     console.log(error);
   }
 }
 
+// display error function
+const displayError = (err) => {
+  error.style.display = "flex";
+  error.lastElementChild.innerHTML = err;
+  setTimeout(() => {
+    error.style.display = "none";
+    error.lastElementChild.innerHTML = "";
+  }, 3000);
+};
+
 imageFile.addEventListener("change", (e) => {
   selectedImage = e.target.files[0];
   if (selectedImage.type.split("/")[0] !== "image") {
-    error.style.display = "flex";
-    error.lastElementChild.innerHTML = "images only allowed";
-    setTimeout(() => {
-      error.style.display = "none";
-      error.lastElementChild.innerHTML = "";
-    }, 3000);
+    displayError("images only allowed");
   } else {
     addImage();
   }
@@ -113,44 +113,42 @@ imageFile.addEventListener("change", (e) => {
 
 generateBtn.addEventListener("click", () => {
   if (imageContainer.innerHTML === "") {
-    error.style.display = "flex";
-    error.lastElementChild.innerHTML = "please upload an image first";
-    setTimeout(() => {
-      error.style.display = "none";
-      error.lastElementChild.innerHTML = "";
-    }, 3000);
+    displayError("please Upload an image first");
+  } else if (generateBtn.innerHTML === "Try again") {
+    imageContainer.innerHTML = "";
+    imageContainer.style.display = "none";
+    closeBtn.style.display = "none";
+    uploadFile.style.display = "flex";
+    generateBtn.innerHTML = "Generate";
   } else {
     generateHeatmap();
   }
 });
 
-function showHelp() {
-  helps.forEach((help) =>
-    help.addEventListener("click", (e) => {
-      const content = document.createElement("div");
-      content.classList = "content";
-      const title = document.createElement("div");
-      title.classList = "title";
-      const h4 = document.createElement("h4");
-      h4.innerHTML = helpsContent[`${e.currentTarget.dataset.modelname}`].title;
-      const close = document.createElement("i");
-      close.classList = "close fa-solid fa-circle-xmark";
-      title.appendChild(h4);
-      title.appendChild(close);
-      content.appendChild(title);
-      const p = document.createElement("p");
-      p.innerHTML = helpsContent[`${e.currentTarget.dataset.modelname}`].desc;
-      content.appendChild(p);
-      dialog.appendChild(content);
-      dialog.style.display = "flex";
-      close.addEventListener("click", () => {
-        dialog.innerHTML = "";
-        dialog.style.display = "none";
-      });
-    })
-  );
-}
-showHelp();
+helps.forEach((help) =>
+  help.addEventListener("click", (e) => {
+    const content = document.createElement("div");
+    content.classList = "content";
+    const title = document.createElement("div");
+    title.classList = "title";
+    const h4 = document.createElement("h4");
+    h4.innerHTML = helpsContent[`${e.currentTarget.dataset.modelname}`].title;
+    const close = document.createElement("i");
+    close.classList = "close fa-solid fa-circle-xmark";
+    title.appendChild(h4);
+    title.appendChild(close);
+    content.appendChild(title);
+    const p = document.createElement("p");
+    p.innerHTML = helpsContent[`${e.currentTarget.dataset.modelname}`].desc;
+    content.appendChild(p);
+    dialog.appendChild(content);
+    dialog.style.display = "flex";
+    close.addEventListener("click", () => {
+      dialog.innerHTML = "";
+      dialog.style.display = "none";
+    });
+  })
+);
 
 function adjustHeight() {
   if (image.offsetWidth < 512) {

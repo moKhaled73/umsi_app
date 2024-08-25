@@ -18,7 +18,6 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import cv2
-from sal_imp_utilities import UMSI_eval_generator, reverse_preprocess, postprocess_predictions
 
 
 
