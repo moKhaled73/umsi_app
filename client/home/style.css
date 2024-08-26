@@ -300,27 +300,10 @@ ul li {
     border: 2px solid var(--main-color);
     border-radius: 20px;
     animation: float 4s linear infinite;
-    height: 270px;
+    height: 288px;
 
 }
 
-/*
-@keyframes float {
-    0% {
-        transform: translateY(0rem);
-    }
-
-    50% {
-        transform: translateY(-3.5rem);
-
-    }
-
-    100% {
-        transform: translateY(0rem);
-
-    }
-}
-*/
 .home .container .info h1 {
     font-size: 30px;
     color: var(--main-color);
