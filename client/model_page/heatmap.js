@@ -2,11 +2,11 @@ const links = document.querySelector(".links");
 const tabs = document.querySelectorAll(".tabs li span");
 
 const error = document.querySelector(".model .error");
-const image = document.querySelector(".image");
-const uploadFile = document.querySelector(".image .upload-file");
-const imageContainer = document.querySelector(".image .image-container");
-const closeBtn = document.querySelector(".image .close");
+const container = document.querySelector(".container");
+const upload = document.querySelector(".container .upload");
 const imageFile = document.getElementById("image-file");
+const images = document.querySelector(".container .images");
+const closeBtn = document.querySelector(".container .close");
 const generateBtn = document.querySelector("main .generate");
 let selectedImage = null;
 
@@ -18,12 +18,8 @@ const HEATMAP7S_API_URL = "http://127.0.0.1:8000/heatmap7s/upload";
 const SCANPATH_API_URL = "http://127.0.0.1:8000/scanpath/upload";
 
 const helpsContent = {
-  heatmap3s: {
-    title: "heatmap 3s",
-    desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab quia suscipit amet pariatur sequi vero",
-  },
-  heatamp7s: {
-    title: "heatmap 7s",
+  heatmap: {
+    title: "heatmap",
     desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab quia suscipit amet pariatur sequi vero",
   },
   scanpath: {
@@ -40,32 +36,82 @@ function hideLinks() {
   links.classList.add("hide");
 }
 
+function updataGenerateBtnText() {
+  tabs.forEach((tab) => {
+    if (tab.parentNode.classList.contains("active")) {
+      if (tab.parentNode.lastElementChild.dataset.modelname === "heatmap") {
+        generateBtn.innerHTML = "Generate Heatmap";
+      } else if (
+        tab.parentNode.lastElementChild.dataset.modelname === "scanpath"
+      ) {
+        generateBtn.innerHTML = "Generate Scanpath";
+      }
+    }
+  });
+}
+updataGenerateBtnText();
+
 // active tabs
 tabs.forEach((tab) => {
   tab.addEventListener("click", (e) => {
     tabs.forEach((tab) => tab.parentNode.classList.remove("active"));
     e.target.parentNode.classList.add("active");
+    updataGenerateBtnText();
   });
 });
 
 // add original image
-function addImage() {
-  uploadFile.style.display = "none";
-  imageContainer.style.display = "block";
-  const originalImage = document.createElement("img");
-  originalImage.className = "original-image";
-  originalImage.src = URL.createObjectURL(selectedImage);
-  imageContainer.appendChild(originalImage);
-  image.appendChild(imageContainer);
+function addImages() {
+  upload.style.display = "none";
+  images.style.display = "flex";
+  tabs.forEach((tab) => {
+    if (tab.parentNode.classList.contains("active")) {
+      console.log(tab.parentNode.lastElementChild.dataset.modelname);
+      if (tab.parentNode.lastElementChild.dataset.modelname === "heatmap") {
+        // image one for heatmap 3s
+        const image1 = document.createElement("div");
+        const heatmapName3s = document.createElement("span");
+        heatmapName3s.classList = "heatmap-name";
+        heatmapName3s.innerHTML = "heatmap3s";
+        image1.appendChild(heatmapName3s);
+        image1.className = "image heatmap3s";
+        const img1 = document.createElement("img");
+        img1.className = "original-image";
+        img1.src = URL.createObjectURL(selectedImage);
+        image1.appendChild(img1);
+        images.appendChild(image1);
+        // image two for heatmap 7s
+        const image2 = document.createElement("div");
+        image2.className = "image heatmap7s";
+        const heatmapName7s = document.createElement("span");
+        heatmapName7s.classList = "heatmap-name";
+        heatmapName7s.innerHTML = "heatmap7s";
+        image2.appendChild(heatmapName7s);
+        const img2 = document.createElement("img");
+        img2.className = "original-image";
+        img2.src = URL.createObjectURL(selectedImage);
+        image2.appendChild(img2);
+        images.appendChild(image2);
+      } else {
+        const image = document.createElement("div");
+        image.className = "image";
+        const img = document.createElement("img");
+        img.className = "original-image";
+        img.src = URL.createObjectURL(selectedImage);
+        image.appendChild(img);
+        images.appendChild(image);
+      }
+    }
+  });
   closeBtn.style.display = "block";
 }
 
 // remove original image and heatmap
 closeBtn.addEventListener("click", () => {
-  imageContainer.innerHTML = "";
-  imageContainer.style.display = "none";
+  images.innerHTML = "";
+  images.style.display = "none";
   closeBtn.style.display = "none";
-  uploadFile.style.display = "flex";
+  upload.style.display = "flex";
   imageFile.value = "";
 });
 
@@ -75,17 +121,39 @@ async function generateHeatmap() {
   try {
     const formData = new FormData();
     formData.append("file", selectedImage);
-    const res = await fetch(HEATMAP3S_API_URL, {
+
+    // call api for 3s
+    const res3s = await fetch(HEATMAP3S_API_URL, {
       method: "post",
       body: formData,
     });
+    const blob3s = await res3s.blob();
+    const imageUrl3s = URL.createObjectURL(blob3s);
 
-    const blob = await res.blob();
-    const imageUrl = URL.createObjectURL(blob);
-    const heatmapImage = document.createElement("img");
-    heatmapImage.className = "heatmap-image";
-    heatmapImage.src = imageUrl;
-    imageContainer.appendChild(heatmapImage);
+    // call api for 7s
+    const res7s = await fetch(HEATMAP7S_API_URL, {
+      method: "post",
+      body: formData,
+    });
+    const blob7s = await res7s.blob();
+    const imageUrl7s = URL.createObjectURL(blob7s);
+
+    // add heatmap3s
+    const heatmapImg3s = document.createElement("img");
+    heatmapImg3s.className = "heatmap-image";
+    heatmapImg3s.src = imageUrl3s;
+    document
+      .querySelector(".container .images .heatmap3s")
+      .appendChild(heatmapImg3s);
+
+    // add heatmap7s
+    const heatmapImg7s = document.createElement("img");
+    heatmapImg7s.className = "heatmap-image";
+    heatmapImg7s.src = imageUrl7s;
+    document
+      .querySelector(".container .images .heatmap7s")
+      .appendChild(heatmapImg7s);
+
     generateBtn.innerHTML = "Try again";
   } catch (error) {
     generateBtn.innerHTML = "Generate";
@@ -103,27 +171,36 @@ const displayError = (err) => {
   }, 3000);
 };
 
+// image selection handler
 imageFile.addEventListener("change", (e) => {
   selectedImage = e.target.files[0];
   if (selectedImage.type.split("/")[0] !== "image") {
     displayError("images only allowed");
   } else {
-    addImage();
+    addImages();
   }
 });
 
 generateBtn.addEventListener("click", () => {
-  if (imageContainer.innerHTML === "") {
+  if (images.innerHTML === "") {
     displayError("please Upload an image first");
   } else if (generateBtn.innerHTML === "Try again") {
-    imageContainer.innerHTML = "";
-    imageContainer.style.display = "none";
+    images.innerHTML = "";
+    images.style.display = "none";
     closeBtn.style.display = "none";
-    uploadFile.style.display = "flex";
+    upload.style.display = "flex";
     imageFile.value = "";
-    generateBtn.innerHTML = "Generate";
+    updataGenerateBtnText();
   } else {
-    generateHeatmap();
+    tabs.forEach((tab) => {
+      if (tab.parentNode.classList.contains("active")) {
+        if (tab.parentNode.lastElementChild.dataset.modelname === "heatmap") {
+          generateHeatmap();
+        } else {
+          // generateScanpath()
+        }
+      }
+    });
   }
 });
 
@@ -153,14 +230,13 @@ helps.forEach((help) =>
 );
 
 function adjustHeight() {
-  if (image.offsetWidth < 512) {
-    image.style.flexBasis = `${image.offsetWidth}px`;
+  if (container.offsetWidth < 512) {
+    container.style.flexBasis = `${container.offsetWidth}px`;
   } else {
-    image.style.flexBasis = "512px";
-    image.style.width = "512px";
+    container.style.flexBasis = "512px";
+    container.style.minWidth = "512px";
   }
 }
-
 // Run on page load
 window.onload = adjustHeight;
 
