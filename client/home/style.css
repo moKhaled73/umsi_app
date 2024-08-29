@@ -29,16 +29,7 @@ html {
 
 /*start header*/
 header {
-    /* display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 20px 25px;
-    max-width: 100%;
-    margin-bottom: 2px;
-    margin-top: 10px;
-    margin-top: 5px;
-*/
-    position: sticky;
+    /* position: sticky;*/
     top: 0;
     left: 0;
     background-color: white;
@@ -285,11 +276,11 @@ ul li {
     padding-right: 60px;
     padding-top: 60px;
     background-color: var(--background-color);
-    padding-bottom: 60px;
+    padding-bottom: 120px;
 }
 
 .container {
-
+    margin: 20px 0;
     display: flex;
     align-items: normal;
     justify-content: space-around;
@@ -333,6 +324,7 @@ ul li {
 
 .home .btnhome,
 .btnhome2 {
+    margin-bottom: 30px;
     margin-top: 3%;
     width: 159px;
     height: 53px;
@@ -401,37 +393,35 @@ ul li {
     padding-left: 60px;
     padding-right: 60px;
 
-    .containerServ {
+    h1 {
+        font-size: 53px;
+        color: var(--secondary-color);
 
+    }
 
-        h1 {
-            font-size: 53px;
-            color: var(--secondary-color);
+    .group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 50px;
+        padding: 54px 1px;
+        max-width: 1200px;
+        margin: 0 auto;
 
-        }
-
-        .group {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 50px;
-            padding: 54px 1px;
-            max-width: 1200px;
-            margin: 0 auto;
-
-
-
-            .srv {
-                background-color: #e4dcc485;
-                backdrop-filter: blur(10px);
-                border: 2px solid rgba(255, 255, 255, 0.1);
-                border-radius: 10px;
-                padding: 20px;
-                text-align: start;
-                flex: 1;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-                max-width: 300px;
-                transition: all 0.3s linear;
-                /*
+        .srv {
+            background-color: #e4dcc485;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: start;
+            flex: 1;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            max-width: 300px;
+            /*transition: all 0.3s linear;*/
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+            /*
                 border: 2px solid var(--main-color);
                 display: flex;
                 flex-direction: column;
@@ -441,32 +431,38 @@ ul li {
                 background-color: rgb(255, 255, 255, 0.45);
                 backdrop-filter: blur(10px);*/
 
-                i {
-                    text-align: start;
-                    margin: 0px 34px;
-                    font-size: 30px;
-                }
-
-                h2 {
-                    margin: 20px;
-
-                }
-
-                p {
-                    text-align: start;
-                    margin: 20px;
-                }
+            i {
+                text-align: start;
+                margin: 0px 34px;
+                font-size: 30px;
             }
 
-            .srv:hover {
-                transform: scale(1.1);
-                transition: all 0.3s linear;
-                border: 2px solid rgba(255, 166, 0, 0.4);
+            h2 {
+                margin: 20px;
+
+            }
+
+            p {
+                text-align: start;
+                margin: 20px;
             }
         }
-    }
-}
 
+        .fade-in {
+            opacity: 1;
+            /* Make visible */
+            transform: translateY(0);
+            /* Move to normal position */
+        }
+
+        .srv:hover {
+            transform: scale(1.1);
+            transition: all 0.3s linear;
+            border: 2px solid rgba(255, 166, 0, 0.4);
+        }
+    }
+
+}
 
 @media (max-width: 768px) {
     .serv .containerServ .group {
@@ -931,4 +927,26 @@ scroll
     bottom: 10px;
     right: 10px;
     display: none;
+}
+
+.box {
+    opacity: 0;
+
+}
+
+.slide {
+    animation: slide 1s ease-in-out both;
+}
+
+@keyframes slide {
+    from {
+        opacity: 0;
+        transform: translateY(100%);
+
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }

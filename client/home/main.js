@@ -6,6 +6,7 @@ function hideLinks() {
     const links = document.querySelector(".links");
     links.style.display = 'none';
 }
+/*
 function navigate() {
 
     window.location.href = "../model_page/heatmap.html"
@@ -32,3 +33,47 @@ btn.onclick = function () {
         behavior: 'smooth'
     })
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const services = document.querySelector('.serv');
+    const srv = document.querySelectorAll('.srv');
+    const options = {
+        root: null,
+        threshold: 0.5,
+    };
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                srv.forEach((serv, index) => {
+                    setTimeout(() => {
+                        serv.classList.add('fade-in');
+                    }, index * 300);
+                });
+                observer.unobserve(entry.target);
+            }
+        });
+    }, options);
+
+    observer.observe(services);
+});
+/*-----------------------------------------*/
+const boxes = document.querySelectorAll('.box');
+
+const options = {
+    root: null, // استخدم العرض كمنطقة جذر
+    threshold: 0.2, // يبدأ الأنيميشن عندما يصبح 30% من العنصر مرئيًا
+    rootMargin: '-50px' // لا توجد مسافة إضافية للتقاطع
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('slide');
+            observer.unobserve(entry.target); // توقف عن مراقبة العنصر بعد أن يظهر
+        }
+    });
+}, options);
+
+boxes.forEach(box => {
+    observer.observe(box);
+});
