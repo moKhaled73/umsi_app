@@ -60,16 +60,16 @@ document.addEventListener('DOMContentLoaded', () => {
 const boxes = document.querySelectorAll('.box');
 
 const options = {
-    root: null, // استخدم العرض كمنطقة جذر
-    threshold: 0.2, // يبدأ الأنيميشن عندما يصبح 30% من العنصر مرئيًا
-    rootMargin: '-50px' // لا توجد مسافة إضافية للتقاطع
+    root: null, 
+    threshold: 0.2, 
+    rootMargin: '-50px' 
 };
 
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add('slide');
-            observer.unobserve(entry.target); // توقف عن مراقبة العنصر بعد أن يظهر
+            observer.unobserve(entry.target); 
         }
     });
 }, options);
