@@ -9,6 +9,7 @@ const images = document.querySelector(".container .images");
 const closeBtn = document.querySelector(".container .close");
 const generateBtn = document.querySelector("main .generate");
 let selectedImage = null;
+let selectedTab = "heatmap";
 
 const helps = document.querySelectorAll(".tabs li .help");
 const dialog = document.querySelector(".dialog");
@@ -36,18 +37,13 @@ function hideLinks() {
   links.classList.add("hide");
 }
 
+// updated generate btn
 function updataGenerateBtnText() {
-  tabs.forEach((tab) => {
-    if (tab.parentNode.classList.contains("active")) {
-      if (tab.parentNode.lastElementChild.dataset.modelname === "heatmap") {
-        generateBtn.innerHTML = "Generate Heatmap";
-      } else if (
-        tab.parentNode.lastElementChild.dataset.modelname === "scanpath"
-      ) {
-        generateBtn.innerHTML = "Generate Scanpath";
-      }
-    }
-  });
+  if (selectedTab === "heatmap") {
+    generateBtn.innerHTML = "Generate Heatmap";
+  } else if (selectedTab === "scanpath") {
+    generateBtn.innerHTML = "Generate Scanpath";
+  }
 }
 updataGenerateBtnText();
 
@@ -56,54 +52,43 @@ tabs.forEach((tab) => {
   tab.addEventListener("click", (e) => {
     tabs.forEach((tab) => tab.parentNode.classList.remove("active"));
     e.target.parentNode.classList.add("active");
+    selectedTab = e.target.parentNode.lastElementChild.dataset.modelname;
     updataGenerateBtnText();
+    addOriginalImages();
   });
+  if (tab.parentNode.classList.contains("active")) {
+    selectedTab = tab.parentNode.lastElementChild.dataset.modelname;
+  }
 });
 
+function addOneOriginalImage(imageName, className) {
+  const image = document.createElement("div");
+  const imageNameSpan = document.createElement("span");
+  imageNameSpan.classList = "image-name";
+  imageNameSpan.innerHTML = imageName;
+  image.appendChild(imageNameSpan);
+  image.className = `image ${className}`;
+  const img = document.createElement("img");
+  img.className = "original-image";
+  img.src = URL.createObjectURL(selectedImage);
+  image.appendChild(img);
+  images.appendChild(image);
+}
+
 // add original image
-function addImages() {
-  upload.style.display = "none";
-  images.style.display = "flex";
-  tabs.forEach((tab) => {
-    if (tab.parentNode.classList.contains("active")) {
-      console.log(tab.parentNode.lastElementChild.dataset.modelname);
-      if (tab.parentNode.lastElementChild.dataset.modelname === "heatmap") {
-        // image one for heatmap 3s
-        const image1 = document.createElement("div");
-        const heatmapName3s = document.createElement("span");
-        heatmapName3s.classList = "heatmap-name";
-        heatmapName3s.innerHTML = "heatmap3s";
-        image1.appendChild(heatmapName3s);
-        image1.className = "image heatmap3s";
-        const img1 = document.createElement("img");
-        img1.className = "original-image";
-        img1.src = URL.createObjectURL(selectedImage);
-        image1.appendChild(img1);
-        images.appendChild(image1);
-        // image two for heatmap 7s
-        const image2 = document.createElement("div");
-        image2.className = "image heatmap7s";
-        const heatmapName7s = document.createElement("span");
-        heatmapName7s.classList = "heatmap-name";
-        heatmapName7s.innerHTML = "heatmap7s";
-        image2.appendChild(heatmapName7s);
-        const img2 = document.createElement("img");
-        img2.className = "original-image";
-        img2.src = URL.createObjectURL(selectedImage);
-        image2.appendChild(img2);
-        images.appendChild(image2);
-      } else {
-        const image = document.createElement("div");
-        image.className = "image";
-        const img = document.createElement("img");
-        img.className = "original-image";
-        img.src = URL.createObjectURL(selectedImage);
-        image.appendChild(img);
-        images.appendChild(image);
-      }
+function addOriginalImages() {
+  if (selectedImage) {
+    upload.style.display = "none";
+    images.style.display = "flex";
+    images.innerHTML = "";
+    if (selectedTab === "heatmap") {
+      addOneOriginalImage("heatmap3s", "heatmap3s");
+      addOneOriginalImage("heatmap7s", "heatmap7s");
+    } else if (selectedTab === "scanpath") {
+      addOneOriginalImage("scanpath", "scanpath");
     }
-  });
-  closeBtn.style.display = "block";
+    closeBtn.style.display = "block";
+  }
 }
 
 // remove original image and heatmap
@@ -113,7 +98,23 @@ closeBtn.addEventListener("click", () => {
   closeBtn.style.display = "none";
   upload.style.display = "flex";
   imageFile.value = "";
+  selectedImage = "";
 });
+
+function addOneHeatmapImage(imgUrl, classname) {
+  const heatmapImg3s = document.createElement("img");
+  heatmapImg3s.className = "heatmap-image";
+  heatmapImg3s.src = imgUrl;
+  document
+    .querySelector(`.container .images .${classname}`)
+    .appendChild(heatmapImg3s);
+}
+
+// add heatmap images
+function addHeatmapImages(imageUrl3s, imageUrl7s) {
+  addOneHeatmapImage(imageUrl3s, "heatmap3s");
+  addOneHeatmapImage(imageUrl7s, "heatmap7s");
+}
 
 // call api and display heatmap
 async function generateHeatmap() {
@@ -138,21 +139,36 @@ async function generateHeatmap() {
     const blob7s = await res7s.blob();
     const imageUrl7s = URL.createObjectURL(blob7s);
 
-    // add heatmap3s
-    const heatmapImg3s = document.createElement("img");
-    heatmapImg3s.className = "heatmap-image";
-    heatmapImg3s.src = imageUrl3s;
-    document
-      .querySelector(".container .images .heatmap3s")
-      .appendChild(heatmapImg3s);
+    addHeatmapImages(imageUrl3s, imageUrl7s);
 
-    // add heatmap7s
-    const heatmapImg7s = document.createElement("img");
-    heatmapImg7s.className = "heatmap-image";
-    heatmapImg7s.src = imageUrl7s;
+    generateBtn.innerHTML = "Try again";
+  } catch (error) {
+    generateBtn.innerHTML = "Generate";
+    console.log(error);
+  }
+}
+
+async function generateScanpath() {
+  generateBtn.innerHTML = "Generating...";
+  try {
+    const formData = new FormData();
+    formData.append("file", selectedImage);
+
+    // call api for 3s
+    const res = await fetch(SCANPATH_API_URL, {
+      method: "post",
+      body: formData,
+    });
+    const blob = await res.blob();
+    const scanpathUrl = URL.createObjectURL(blob);
+
+    const scanpathImage = document.createElement("img");
+    scanpathImage.className = "scanpath-image";
+    scanpathImage.src = scanpathUrl;
+
     document
-      .querySelector(".container .images .heatmap7s")
-      .appendChild(heatmapImg7s);
+      .querySelector(`.container .images .scanpath`)
+      .appendChild(scanpathImage);
 
     generateBtn.innerHTML = "Try again";
   } catch (error) {
@@ -177,7 +193,7 @@ imageFile.addEventListener("change", (e) => {
   if (selectedImage.type.split("/")[0] !== "image") {
     displayError("images only allowed");
   } else {
-    addImages();
+    addOriginalImages();
   }
 });
 
@@ -192,15 +208,11 @@ generateBtn.addEventListener("click", () => {
     imageFile.value = "";
     updataGenerateBtnText();
   } else {
-    tabs.forEach((tab) => {
-      if (tab.parentNode.classList.contains("active")) {
-        if (tab.parentNode.lastElementChild.dataset.modelname === "heatmap") {
-          generateHeatmap();
-        } else {
-          // generateScanpath()
-        }
-      }
-    });
+    if (selectedTab === "heatmap") {
+      generateHeatmap();
+    } else if (selectedTab === "scanpath") {
+      generateScanpath();
+    }
   }
 });
 
