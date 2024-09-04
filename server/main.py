@@ -19,6 +19,12 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import cv2
 
+from predict_csv import predict_and_save
+from generate_predicted_results import generate_raw_predicted_results
+from subsample_seq import subsample_seq
+from apply_scanpath_to_images import apply_scanpath_to_images
+from utils import delete_all_files_in_folder
+
 
 
 # Load the model when the script is initialized
@@ -88,7 +94,6 @@ def overlay_heatmap_on_image(original_image, heatmap):
 
 
 app = FastAPI()
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],  # Allows the specified origins
@@ -181,6 +186,28 @@ async def upload_image(file: UploadFile = File(...)):
     return StreamingResponse(img_bytes, media_type="image/png")
 
 
+@app.post("/scanpath/upload")
+async def upload_image(file: UploadFile = File(...)):
+    
+    image_bytes = await file.read()
+    image = Image.open(io.BytesIO(image_bytes))
+    image = np.array(image)
+    cv2.imwrite("./inputs/img.png", image)
+
+    reduced = True
+    img_path = './inputs/'
+    out_path = './outputs/predict/'
+    predict_and_save(img_path, out_path, reduced)
+    generate_raw_predicted_results()
+    subsample_seq()
+    apply_scanpath_to_images()
+
+    scanpath_image = cv2.imread("./outputs/images/img.png")
+
+    _, img_encoded = cv2.imencode('.png', scanpath_image)
+    img_bytes = io.BytesIO(img_encoded.tobytes())
+
+    return StreamingResponse(img_bytes, media_type="image/png")
 
 @app.get("/")
 def root():
