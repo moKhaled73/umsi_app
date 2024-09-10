@@ -192,7 +192,9 @@ async def upload_image(file: UploadFile = File(...)):
     image_bytes = await file.read()
     image = Image.open(io.BytesIO(image_bytes))
     image = np.array(image)
-    cv2.imwrite("./inputs/img.png", image)
+    # Convert RGB to BGR (since OpenCV uses BGR format)
+    image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    cv2.imwrite("./inputs/img.png", image_bgr)
 
     reduced = True
     img_path = './inputs/'

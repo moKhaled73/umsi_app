@@ -40,7 +40,7 @@ function hideLinks() {
 // updated generate btn
 function updataGenerateBtnText() {
   if (selectedTab === "heatmap") {
-    generateBtn.innerHTML = "Generate Heatmap";
+    generateBtn.innerHTML = `Generate Heatmap`;
   } else if (selectedTab === "scanpath") {
     generateBtn.innerHTML = "Generate Scanpath";
   }
@@ -62,16 +62,29 @@ tabs.forEach((tab) => {
 });
 
 function addOneOriginalImage(imageName, className) {
+  // create image container for original image and image name
   const image = document.createElement("div");
+  image.className = `image ${className}`;
+
+  // create info dev and show and hide button
+  const info = document.createElement("div");
+  info.className = "info";
+
+  // create span for image name and append to image container
   const imageNameSpan = document.createElement("span");
   imageNameSpan.classList = "image-name";
   imageNameSpan.innerHTML = imageName;
-  image.appendChild(imageNameSpan);
-  image.className = `image ${className}`;
+  info.appendChild(imageNameSpan);
+
+  image.appendChild(info);
+
+  // create original image and append to image container
   const img = document.createElement("img");
   img.className = "original-image";
   img.src = URL.createObjectURL(selectedImage);
   image.appendChild(img);
+
+  // append image container to images container
   images.appendChild(image);
 }
 
@@ -99,26 +112,33 @@ closeBtn.addEventListener("click", () => {
   upload.style.display = "flex";
   imageFile.value = "";
   selectedImage = "";
+  updataGenerateBtnText();
 });
 
-function addOneHeatmapImage(imgUrl, classname) {
-  const heatmapImg3s = document.createElement("img");
-  heatmapImg3s.className = "heatmap-image";
-  heatmapImg3s.src = imgUrl;
+function addHeatmapOrScanpathImage(imgUrl, classname) {
+  const image = document.createElement("img");
+  image.className =
+    selectedTab === "heatmap"
+      ? "result-image heatmap-image"
+      : "result-image scanpath-image";
+  image.src = imgUrl;
+  const toggleImageIcon = document.createElement("i");
+  toggleImageIcon.className = "fa-solid fa-eye";
   document
-    .querySelector(`.container .images .${classname}`)
-    .appendChild(heatmapImg3s);
-}
+    .querySelector(`.container .images .${classname} .info`)
+    .appendChild(toggleImageIcon);
+  document.querySelector(`.container .images .${classname}`).appendChild(image);
 
-// add heatmap images
-function addHeatmapImages(imageUrl3s, imageUrl7s) {
-  addOneHeatmapImage(imageUrl3s, "heatmap3s");
-  addOneHeatmapImage(imageUrl7s, "heatmap7s");
+  toggleImageIcon.addEventListener("click", (e) => {
+    e.target.classList.toggle("fa-eye");
+    e.target.classList.toggle("fa-eye-slash");
+    e.target.parentNode.parentNode.lastElementChild.classList.toggle("hide");
+  });
 }
 
 // call api and display heatmap
 async function generateHeatmap() {
-  generateBtn.innerHTML = "Generating...";
+  generateBtn.innerHTML = `<span class='loading'></span>`;
   try {
     const formData = new FormData();
     formData.append("file", selectedImage);
@@ -139,17 +159,18 @@ async function generateHeatmap() {
     const blob7s = await res7s.blob();
     const imageUrl7s = URL.createObjectURL(blob7s);
 
-    addHeatmapImages(imageUrl3s, imageUrl7s);
+    addHeatmapOrScanpathImage(imageUrl3s, "heatmap3s");
+    addHeatmapOrScanpathImage(imageUrl7s, "heatmap7s");
 
     generateBtn.innerHTML = "Try again";
   } catch (error) {
-    generateBtn.innerHTML = "Generate";
+    updataGenerateBtnText();
     console.log(error);
   }
 }
 
 async function generateScanpath() {
-  generateBtn.innerHTML = "Generating...";
+  generateBtn.innerHTML = `<span class='loading'></span>`;
   try {
     const formData = new FormData();
     formData.append("file", selectedImage);
@@ -162,17 +183,11 @@ async function generateScanpath() {
     const blob = await res.blob();
     const scanpathUrl = URL.createObjectURL(blob);
 
-    const scanpathImage = document.createElement("img");
-    scanpathImage.className = "scanpath-image";
-    scanpathImage.src = scanpathUrl;
-
-    document
-      .querySelector(`.container .images .scanpath`)
-      .appendChild(scanpathImage);
+    addHeatmapOrScanpathImage(scanpathUrl, "scanpath");
 
     generateBtn.innerHTML = "Try again";
   } catch (error) {
-    generateBtn.innerHTML = "Generate";
+    updataGenerateBtnText();
     console.log(error);
   }
 }
