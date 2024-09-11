@@ -19,11 +19,20 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import cv2
 
+from predict_csv import predict_and_save
+from generate_predicted_results import generate_raw_predicted_results
+from subsample_seq import subsample_seq
+from apply_scanpath_to_images import apply_scanpath_to_images
+from utils import delete_all_files_in_folder
+
 
 
 # Load the model when the script is initialized
-weightsPath = 'models/umsi-3s.h5'
-model = tf.keras.models.load_model(weightsPath)
+heatmap3s_weights = 'models/umsi-3s.h5'
+heatmap7s_weights = 'models/umsi-7s.h5'
+heatmap3s_model = tf.keras.models.load_model(heatmap3s_weights)
+heatmap7s_model = tf.keras.models.load_model(heatmap7s_weights)
+
 
 def padding(img, shape_r, shape_c, channels=3):
     img_padded = np.zeros((shape_r, shape_c, channels), dtype=np.uint8)
@@ -85,7 +94,6 @@ def overlay_heatmap_on_image(original_image, heatmap):
 
 
 app = FastAPI()
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],  # Allows the specified origins
@@ -116,8 +124,8 @@ async def upload_image(file: UploadFile = File(...)):
     ims[:, :, :, 2] -= 123.68
 
 
-    # Step 4: Predict using the model
-    preds = model.predict(ims)
+    # Step 4: Predict using the model 3s
+    preds = heatmap3s_model.predict(ims)
     preds_map = preds[0][0]
 
     # Step 4: Resize the preds_map to match the original image size
@@ -129,25 +137,77 @@ async def upload_image(file: UploadFile = File(...)):
     heatmap = np.uint8(255 * heatmap)  # Scale to [0, 255]
     heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
 
-    # # Step 6: Overlay the heatmap on the original image
-    # overlay_img = cv2.addWeighted(img, 0.6, heatmap, 0.4, 0)
-
-    # Define the opacity level (alpha), where 1.0 is fully opaque and 0.0 is fully transparent
-    alpha = 1  # 50% opacity
-
-    # Create a blank white image with the same size as the original image
-    background = np.ones_like(heatmap, dtype=np.uint8) * 255
-
-    # Blend the image with the white background using the alpha value
-    blended_image = cv2.addWeighted(heatmap, alpha, background, 1 - alpha, 0)
-
     
     # Step 6: Convert the result to bytes and return it
-    _, img_encoded = cv2.imencode('.png', blended_image)
+    _, img_encoded = cv2.imencode('.png', heatmap)
     img_bytes = io.BytesIO(img_encoded.tobytes())
     
     return StreamingResponse(img_bytes, media_type="image/png")
 
+@app.post("/heatmap7s/upload")
+async def upload_image(file: UploadFile = File(...)):
+    
+    image_bytes = await file.read()
+    image = Image.open(io.BytesIO(image_bytes))
+
+    if image.mode != 'RGB':
+        image = image.convert('RGB')
+
+    img = np.array(image)
+    
+
+    ims = np.zeros((1, 256, 256, 3))
+    padded_image = padding(img, 256, 256, 3)
+    ims[0] = padded_image
+
+    ims[:, :, :, 0] -= 103.939
+    ims[:, :, :, 1] -= 116.779
+    ims[:, :, :, 2] -= 123.68
+
+
+    # Step 4: Predict using the model 3s
+    preds = heatmap7s_model.predict(ims)
+    preds_map = preds[0][0]
+
+    # Step 4: Resize the preds_map to match the original image size
+    heatmap = cv2.resize(preds_map, (512, 512))
+
+    # Step 5: Normalize and apply colormap to the heatmap
+    heatmap = np.maximum(heatmap, 0)  # Ensure all values are positive
+    heatmap /= heatmap.max()  # Normalize between 0 and 1
+    heatmap = np.uint8(255 * heatmap)  # Scale to [0, 255]
+    heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
+
+    
+    # Step 6: Convert the result to bytes and return it
+    _, img_encoded = cv2.imencode('.png', heatmap)
+    img_bytes = io.BytesIO(img_encoded.tobytes())
+    
+    return StreamingResponse(img_bytes, media_type="image/png")
+
+
+@app.post("/scanpath/upload")
+async def upload_image(file: UploadFile = File(...)):
+    
+    image_bytes = await file.read()
+    image = Image.open(io.BytesIO(image_bytes))
+    image = np.array(image)
+    cv2.imwrite("./inputs/img.png", image)
+
+    reduced = True
+    img_path = './inputs/'
+    out_path = './outputs/predict/'
+    predict_and_save(img_path, out_path, reduced)
+    generate_raw_predicted_results()
+    subsample_seq()
+    apply_scanpath_to_images()
+
+    scanpath_image = cv2.imread("./outputs/images/img.png")
+
+    _, img_encoded = cv2.imencode('.png', scanpath_image)
+    img_bytes = io.BytesIO(img_encoded.tobytes())
+
+    return StreamingResponse(img_bytes, media_type="image/png")
 
 @app.get("/")
 def root():

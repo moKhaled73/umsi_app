@@ -17,70 +17,80 @@
   <link rel="stylesheet" href="heatmap.css" />
 </head>
 
-<body>
-  <!--start header-->
-  <header>
-    <div class="img">
-      <img src="../images/logo-removebg-preview.png" alt="InsightGaze" />
-      <span>InsightGaze</span>
-    </div>
-    <div class="links hide">
-      <div class="close" onclick="hideLinks()">
-        <a href="#"><i class="fa-regular fa-circle-xmark"></i></a>
+  <body>
+    <!--start header-->
+    <header>
+      <div class="img">
+        <img src="../images/logo-removebg-preview.png" alt="InsightGaze" />
+        <span>InsightGaze</span>
       </div>
-      <ul>
+      <div class="links hide">
+        <div class="close" onclick="hideLinks()">
+          <a href="#"><i class="fa-regular fa-circle-xmark"></i></a>
+        </div>
+        <ul>
+          <li class="active">
+            <i class="fa-solid fa-house" style="color: #c77529"></i>
+            <a href="../home/index.html#home">home</a>
+          </li>
+          <li class="active">
+            <i class="fa-solid fa-users-gear" style="color: #c77529"></i
+            ><a href="../home/index.html#services">Services</a>
+          </li>
+          <li class="active">
+            <i class="fa-regular fa-address-card" style="color: #c77529"></i
+            ><a href="../home/index.html#about">about</a>
+          </li>
+          <li class="active">
+            <i
+              id="conn"
+              class="fa-solid fa-phone-volume"
+              style="color: #c77529"
+            ></i
+            ><a href="../home/index.html#contact">contact</a>
+          </li>
+        </ul>
+        <div class="buttons">
+          <button class="login">log in</button>
+          <button class="signup">sign up</button>
+        </div>
+      </div>
+      <div class="menu" onclick="showLinks()">
+        <a href="#"><i class="fa-solid fa-bars"></i> </a>
+      </div>
+    </header>
+    <!--end header-->
+    <!-- start model -->
+    <main>
+      <ul class="tabs">
         <li class="active">
-          <i class="fa-solid fa-house" style="color: #c77529"></i>
-          <a href="../home/index.html#home">home</a>
+          <span>heatmap</span
+          ><i
+            data-modelname="heatmap"
+            class="help fa-regular fa-circle-question"
+          ></i>
         </li>
-        <li class="active">
-          <i class="fa-solid fa-users-gear" style="color: #c77529"></i><a
-            href="../home/index.html#services">Services</a>
-        </li>
-        <li class="active">
-          <i class="fa-regular fa-address-card" style="color: #c77529"></i><a href="../home/index.html#about">about</a>
-        </li>
-        <li class="active">
-          <i id="conn" class="fa-solid fa-phone-volume" style="color: #c77529"></i><a
-            href="../home/index.html#contact">contact</a>
+        <li>
+          <span>scanpath</span
+          ><i
+            data-modelname="scanpath"
+            class="help fa-regular fa-circle-question"
+          ></i>
         </li>
       </ul>
-      <div class="buttons">
-        <button class="login">log in</button>
-        <button class="signup">sign up</button>
-      </div>
-    </div>
-    <div class="menu" onclick="showLinks()">
-      <a href="#"><i class="fa-solid fa-bars"></i> </a>
-    </div>
-  </header>
-  <!--end header-->
-  <!-- start model -->
-  <main>
-    <ul class="tabs">
-      <li class="active">
-        <span>heatmap 3s</span><i data-modelname="heatmap3s" class="help fa-regular fa-circle-question"></i>
-      </li>
-      <li>
-        <span>heatmap 7s</span><i data-modelname="heatamp7s" class="help fa-regular fa-circle-question"></i>
-      </li>
-      <li>
-        <span>scanpath</span><i data-modelname="scanpath" class="help fa-regular fa-circle-question"></i>
-      </li>
-    </ul>
-    <section class="model">
-      <div class="error">
-        <i class="fa-solid fa-exclamation"></i>
-        <p class="content"></p>
-      </div>
-      <div class="image">
-        <div class="upload-file">
-          <input type="file" id="image-file" />
-          <p>click to select or drag and drop image</p>
+      <section class="model">
+        <div class="error">
+          <i class="fa-solid fa-exclamation"></i>
+          <p class="content"></p>
         </div>
-        <div class="image-container"></div>
-        <i class="close fa-solid fa-circle-xmark"></i>
-      </div>
+        <div class="container">
+          <div class="upload">
+            <input type="file" id="image-file" />
+            <p>click to select or drag and drop image</p>
+          </div>
+          <div class="images"></div>
+          <i class="close fa-solid fa-circle-xmark"></i>
+        </div>
 
       <button class="generate">Generate</button>
     </section>

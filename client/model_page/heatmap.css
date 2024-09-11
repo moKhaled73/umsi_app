@@ -9,7 +9,6 @@
 :root {
   --main-color: #ea580c;
   --secondary-color: orange;
-  --linear: linear-gradient(180deg, var(--secondary-color), var(--main-color));
 }
 
 ul {
@@ -356,7 +355,7 @@ main {
         height: 512px;
         position: relative;
 
-        .heatmap-name {
+        .image-name {
           position: absolute;
           top: 5px;
           left: 5px;
@@ -384,6 +383,14 @@ main {
           height: 100%;
           opacity: 0;
           animation: fadeIn 5s forwards;
+        }
+        .scanpath-image {
+          position: absolute;
+          top: 0;
+          left: 0;
+          object-fit: contain;
+          width: 100%;
+          height: 100%;
         }
       }
     }
