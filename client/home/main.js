@@ -6,7 +6,7 @@ function hideLinks() {
     const links = document.querySelector(".links");
     links.style.display = 'none';
 }
-/*
+
 function navigate() {
 
     window.location.href = "../model_page/heatmap.html"
