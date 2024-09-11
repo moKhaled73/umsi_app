@@ -66,12 +66,12 @@ header {
       li {
         list-style: none;
 
-        i {
-          margin-right: 7px;
-        }
-        #conn {
-          transform: rotate(-24deg);
-        }
+      i {
+        margin-right: 7px;
+      }
+      #conn {
+        transform: rotate(-24deg);
+      }
 
         a {
           text-decoration: none;
@@ -83,20 +83,20 @@ header {
       }
     }
 
-    .buttons {
-      display: flex;
-      gap: 20px;
-      .login {
-        width: 130px;
-        height: 45px;
-        border: 2px solid var(--main-color);
-        border-radius: 32px;
-        background: var(--main-color);
-        color: white;
-        font-size: 19px;
-        cursor: pointer;
-        transition: all 0.3s linear;
-      }
+  .buttons {
+    display: flex;
+    gap: 20px;
+    .login {
+      width: 130px;
+      height: 45px;
+      border: 2px solid var(--main-color);
+      border-radius: 32px;
+      background: var(--main-color);
+      color: white;
+      font-size: 19px;
+      cursor: pointer;
+      transition: all 0.3s linear;
+    }
 
       .login:hover {
         box-shadow: 0rem 0rem 1.3rem var(--main-color);
@@ -132,6 +132,7 @@ header {
 @media (max-width: 1200px) {
   .links {
     flex: 0.8;
+
     .buttons {
       gap: 4px !important;
     }
@@ -157,13 +158,16 @@ header {
     backdrop-filter: blur(10px);
     transition: all 0.3s linear;
     padding: 5px;
+
     &.hide {
       display: none;
     }
+
     .close {
       padding: 10px 20px;
       display: block;
     }
+
     ul {
       flex-direction: column;
       justify-content: start;
@@ -179,6 +183,7 @@ header {
         a {
           width: 100%;
         }
+
         &:hover {
           background-color: #f0f0f0;
         }
@@ -191,14 +196,16 @@ header {
       gap: 30px;
 
       button {
-        width: 100% !important ;
+        width: 100% !important;
       }
     }
   }
+
   .menu {
     display: block;
   }
 }
+
 /*end header*/
 
 /* start model */
@@ -206,11 +213,13 @@ main {
   min-height: calc(100vh - 85px);
   background-color: #eee;
   padding: 10px 20px;
+
   .tabs {
     display: flex;
     gap: 10px;
     margin-bottom: 10px;
     border-bottom: 2px solid var(--main-color);
+
     li {
       border: 2px solid var(--main-color);
       border-bottom: none;
@@ -221,12 +230,15 @@ main {
       display: flex;
       align-items: center;
       background-color: white;
+
       span {
         padding: 6px 12px;
       }
+
       i {
         padding-right: 12px;
       }
+
       &:hover,
       &.active {
         background-color: var(--main-color);
@@ -246,9 +258,11 @@ main {
         border: 1px solid var(--main-color);
         border-bottom: none;
         font-size: 12px;
+
         span {
           padding: 3px 6px;
         }
+
         i {
           padding-right: 3px;
         }
@@ -270,6 +284,7 @@ main {
     display: none;
     align-items: center;
     gap: 5px;
+
     i {
       display: flex;
       align-items: center;
@@ -281,6 +296,7 @@ main {
       text-align: center;
       font-size: 14px;
     }
+
     p {
       background-color: inherit;
       color: inherit;
@@ -307,6 +323,7 @@ main {
       justify-content: center;
       align-items: center;
       position: relative;
+
       #image-file {
         position: absolute;
         top: 0;
@@ -316,6 +333,7 @@ main {
         opacity: 0;
         cursor: pointer;
       }
+
       p {
         font-size: 25px;
         font-style: italic;
@@ -327,6 +345,7 @@ main {
     .images {
       display: none;
       gap: 5px;
+
       .image {
         width: 512px;
         height: 512px;
@@ -363,7 +382,7 @@ main {
           width: 100%;
           height: 100%;
         }
-        .result-image {
+        .heatmap-image {
           position: absolute;
           top: 0;
           left: 0;
@@ -438,17 +457,20 @@ main .generate {
   .model {
     .container {
       width: 100% !important;
+
       .upload {
         p {
           font-size: 16px;
         }
       }
+
       .image-container {
         width: 100%;
         height: 100%;
       }
     }
   }
+
   main .generate {
     width: 100%;
   }
@@ -458,8 +480,10 @@ main .generate {
   0% {
     opacity: 0;
   }
+
   100% {
-    opacity: 0.5; /* Final opacity of 0.5 */
+    opacity: 0.5;
+    /* Final opacity of 0.5 */
   }
 }
 
@@ -481,11 +505,13 @@ main .generate {
   width: 350px;
   padding: 10px;
   border-radius: 8px;
+
   .title {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+
     i {
       color: red;
       cursor: pointer;
