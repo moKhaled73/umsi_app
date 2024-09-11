@@ -18,6 +18,10 @@ const HEATMAP3S_API_URL = "http://127.0.0.1:8000/heatmap3s/upload";
 const HEATMAP7S_API_URL = "http://127.0.0.1:8000/heatmap7s/upload";
 const SCANPATH_API_URL = "http://127.0.0.1:8000/scanpath/upload";
 
+const url = window.location.search;
+const searchParams = new URLSearchParams(url);
+const SPTab = searchParams.get("tab");
+
 const helpsContent = {
   heatmap: {
     title: "heatmap",
@@ -56,6 +60,13 @@ tabs.forEach((tab) => {
     updataGenerateBtnText();
     addOriginalImages();
   });
+  if (tab.parentNode.lastElementChild.dataset.modelname === SPTab) {
+    tabs.forEach((tab) => tab.parentNode.classList.remove("active"));
+    tab.parentNode.classList.add("active");
+    selectedTab = tab.parentNode.lastElementChild.dataset.modelname;
+    updataGenerateBtnText();
+    addOriginalImages();
+  }
   if (tab.parentNode.classList.contains("active")) {
     selectedTab = tab.parentNode.lastElementChild.dataset.modelname;
   }
