@@ -60,16 +60,16 @@ document.addEventListener('DOMContentLoaded', () => {
 const boxes = document.querySelectorAll('.box');
 
 const options = {
-    root: null, 
-    threshold: 0.2, 
-    rootMargin: '-50px' 
+    root: null,
+    threshold: 0.2,
+    rootMargin: '-50px'
 };
 
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add('slide');
-            observer.unobserve(entry.target); 
+            observer.unobserve(entry.target);
         }
     });
 }, options);
@@ -77,3 +77,29 @@ const observer = new IntersectionObserver((entries) => {
 boxes.forEach(box => {
     observer.observe(box);
 });
+
+/* theme Dark */
+
+let btn = document.querySelector(".switch");
+btn.onclick = function () {
+    document.body.classList.toggle("dark-theme");
+};
+
+/*
+document.addEventListener("DOMContentLoaded", function() {
+    let btn = document.querySelector(".switch");
+
+    // قائمة الألوان البديلة للخلفية فقط
+    const backgroundColors = [
+        "#555"  
+    ];
+
+    
+    let currentBackgroundIndex = 0;
+
+    // وظيفة تغيير الخلفية فقط
+    btn.onclick = function () {
+        currentBackgroundIndex = (currentBackgroundIndex + 1) % backgroundColors.length;
+        document.documentElement.style.setProperty("--background-color", backgroundColors[currentBackgroundIndex]);
+    };
+});*/
