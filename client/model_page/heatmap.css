@@ -31,58 +31,52 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 5px 20px;
+  padding: 10px 20px;
   max-width: 100%;
-
-  .img {
-    width: 70px;
-    display: flex;
-    align-items: center;
-
-    img {
-      width: 100%;
-    }
-
-    span {
-      color: var(--main-color);
-      font-weight: 700;
-      font-size: 20px;
-    }
+}
+.img {
+  width: 70px;
+  display: flex;
+  align-items: center;
+  img {
+    width: 100%;
   }
-  .links {
-    position: relative;
+  span {
+    color: var(--main-color);
+    font-weight: 700;
+    font-size: 20px;
+  }
+}
+.links {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  flex: 0.75;
+  .close {
+    display: none;
+  }
+  ul {
     display: flex;
     justify-content: space-between;
-    flex: 0.75;
-    .close {
-      display: none;
-    }
-    ul {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 60px;
-
-      li {
-        list-style: none;
-
+    align-items: center;
+    gap: 60px;
+    li {
+      list-style: none;
       i {
         margin-right: 7px;
       }
       #conn {
         transform: rotate(-24deg);
       }
-
-        a {
-          text-decoration: none;
-          text-transform: capitalize;
-          font-size: 16px;
-          font-weight: 600;
-          color: #666;
-        }
+      a {
+        text-decoration: none;
+        text-transform: capitalize;
+        font-size: 16px;
+        font-weight: 600;
+        color: #666;
       }
     }
-
+  }
   .buttons {
     display: flex;
     gap: 20px;
@@ -97,52 +91,43 @@ header {
       cursor: pointer;
       transition: all 0.3s linear;
     }
-
-      .login:hover {
-        box-shadow: 0rem 0rem 1.3rem var(--main-color);
-        transition: all 0.3s ease-in-out;
-        transform: scale(1.1);
-      }
-
-      .signup {
-        background-color: none;
-        color: var(--main-color);
-        border: 2px solid var(--main-color);
-        font-size: 19px;
-        width: 130px;
-        height: 45px;
-        border-radius: 32px;
-        cursor: pointer;
-        transition: all 0.3s linear;
-      }
-
-      .signup:hover {
-        box-shadow: 0rem 0rem 1.3rem var(--main-color);
-        transition: all 0.3s ease-in-out;
-        transform: scale(1.1);
-      }
+    .login:hover {
+      box-shadow: 0rem 0rem 1.3rem var(--main-color);
+      transition: all 0.3s ease-in-out;
+      transform: scale(1.1);
+    }
+    .signup {
+      background-color: none;
+      color: var(--main-color);
+      border: 2px solid var(--main-color);
+      font-size: 19px;
+      width: 130px;
+      height: 45px;
+      border-radius: 32px;
+      cursor: pointer;
+      transition: all 0.3s linear;
+    }
+    .signup:hover {
+      box-shadow: 0rem 0rem 1.3rem var(--main-color);
+      transition: all 0.3s ease-in-out;
+      transform: scale(1.1);
     }
   }
-
-  .menu {
-    display: none;
-  }
 }
-
+.menu {
+  display: none;
+}
 @media (max-width: 1200px) {
   .links {
     flex: 0.8;
-
     .buttons {
       gap: 4px !important;
     }
-
     ul {
       gap: 33px !important;
     }
   }
 }
-
 @media (max-width: 990px) {
   .links {
     position: fixed;
@@ -158,56 +143,45 @@ header {
     backdrop-filter: blur(10px);
     transition: all 0.3s linear;
     padding: 5px;
-
     &.hide {
       display: none;
     }
-
     .close {
       padding: 10px 20px;
       display: block;
     }
-
     ul {
       flex-direction: column;
       justify-content: start;
       align-items: start;
       flex: 1;
-
       li {
         width: 100%;
         border-radius: 8px;
         padding: 10px 20px;
         cursor: pointer;
-
         a {
           width: 100%;
         }
-
         &:hover {
           background-color: #f0f0f0;
         }
       }
     }
-
     .buttons {
       flex-direction: column;
       padding: 10px 20px;
       gap: 30px;
-
       button {
-        width: 100% !important;
+        width: 100% !important ;
       }
     }
   }
-
   .menu {
     display: block;
   }
 }
-
 /*end header*/
-
 /* start model */
 main {
   min-height: calc(100vh - 85px);
