@@ -11,6 +11,15 @@ function navigate() {
 
     window.location.href = "../model_page/heatmap.html"
 }
+function login() {
+
+    window.location.href = "login.html"
+}
+function signup() {
+
+    window.location.href = "sign.html"
+}
+
 /*
 scroll
 */
@@ -79,27 +88,43 @@ boxes.forEach(box => {
 });
 
 /* theme Dark */
+let themeIcon = document.querySelector(".theme");
+let lightIcon = document.querySelector(".light");
 
-let btn = document.querySelector(".switch");
-btn.onclick = function () {
+themeIcon.onclick = function () {
+    // تبديل الثيم بين الوضع الداكن والعادي
     document.body.classList.toggle("dark-theme");
+
+    if (document.body.classList.contains("dark-theme")) {
+        // إخفاء القمر وإظهار الشمس مع تحريك الشمس
+        themeIcon.style.display = "none";
+        lightIcon.style.display = "inline";
+
+        // إضافة الحركة للشمس بعد ظهورها
+        setTimeout(() => {
+            lightIcon.classList.add("move");
+        }, 100); // تأخير قصير لانتظار الشمس حتى تظهر
+    } else {
+        // إعادة الوضع العادي: إظهار القمر وإخفاء الشمس
+        themeIcon.style.display = "inline";
+        lightIcon.style.display = "none";
+        lightIcon.classList.remove("move"); // إزالة الحركة عندما يتم إخفاء الشمس
+    }
 };
 
-/*
-document.addEventListener("DOMContentLoaded", function() {
-    let btn = document.querySelector(".switch");
+// السماح بالنقر على أيقونة الشمس للتبديل مرة أخرى مع تحريك القمر
+lightIcon.onclick = function () {
+    document.body.classList.remove("dark-theme");
 
-    // قائمة الألوان البديلة للخلفية فقط
-    const backgroundColors = [
-        "#555"  
-    ];
+    // إخفاء الشمس وإظهار القمر مع تحريك القمر
+    lightIcon.style.display = "none";
+    themeIcon.style.display = "inline";
 
-    
-    let currentBackgroundIndex = 0;
+    // إضافة الحركة للقمر
+    setTimeout(() => {
+        themeIcon.classList.add("move");
+    }, 100);
 
-    // وظيفة تغيير الخلفية فقط
-    btn.onclick = function () {
-        currentBackgroundIndex = (currentBackgroundIndex + 1) % backgroundColors.length;
-        document.documentElement.style.setProperty("--background-color", backgroundColors[currentBackgroundIndex]);
-    };
-});*/
+    // إزالة الحركة عند إعادة الضغط
+    themeIcon.classList.remove("move");
+};
