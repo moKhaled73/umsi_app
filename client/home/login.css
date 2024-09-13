@@ -31,8 +31,9 @@ body {
     padding: 40px;
 
     h2 {
-        font-size: larger;
+        font-size: 25px;
         text-align: center;
+        text-transform: capitalize;
     }
 }
 
@@ -100,10 +101,11 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
     height: 40px;
     background-color: black;
     color: white;
-    font-size: 13px;
+    font-size: 15px;
     border-radius: 10px;
     margin: 14px 0px;
     border: none;
+    cursor: pointer;
 }
 .register{
     font-size: large;
