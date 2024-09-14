@@ -128,6 +128,7 @@ closeBtn.addEventListener("click", () => {
 
 function addHeatmapOrScanpathImage(imgUrl, classname) {
   const image = document.createElement("img");
+  const info = document.querySelector(`.container .images .${classname} .info`);
   image.className =
     selectedTab === "heatmap"
       ? "result-image heatmap-image"
@@ -135,15 +136,54 @@ function addHeatmapOrScanpathImage(imgUrl, classname) {
   image.src = imgUrl;
   const toggleImageIcon = document.createElement("i");
   toggleImageIcon.className = "fa-solid fa-eye";
-  document
-    .querySelector(`.container .images .${classname} .info`)
-    .appendChild(toggleImageIcon);
+  info.appendChild(toggleImageIcon);
+  const downloadIcon = document.createElement("i");
+  downloadIcon.className = "fa-solid fa-download";
+  info.appendChild(downloadIcon);
+
   document.querySelector(`.container .images .${classname}`).appendChild(image);
 
   toggleImageIcon.addEventListener("click", (e) => {
     e.target.classList.toggle("fa-eye");
     e.target.classList.toggle("fa-eye-slash");
     e.target.parentNode.parentNode.lastElementChild.classList.toggle("hide");
+  });
+
+  downloadIcon.addEventListener("click", (e) => {
+    const canvas = document.createElement("canvas");
+    let ctx = canvas.getContext("2d");
+    // Load the original image
+    const originalImage = document.createElement("img");
+    originalImage.src = URL.createObjectURL(selectedImage);
+
+    originalImage.onload = () => {
+      // Set the canvas size based on the original image dimensions
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+
+      // Draw the original image onto the canvas
+      ctx.drawImage(
+        originalImage,
+        0,
+        0,
+        image.naturalWidth,
+        image.naturalHeight
+      );
+
+      // Set opacity for the heatmap
+      ctx.globalAlpha = 0.5;
+
+      ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
+
+      // Reset global alpha to default (1) after drawing
+      ctx.globalAlpha = 1.0;
+
+      // Create a download link for the merged image
+      let link = document.createElement("a");
+      link.download = "merged-image.png";
+      link.href = canvas.toDataURL(); // Convert canvas to data URL
+      link.click();
+    };
   });
 }
 
