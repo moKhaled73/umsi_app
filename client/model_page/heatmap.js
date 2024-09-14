@@ -394,19 +394,22 @@ function changeIcon() {
 if (localStorage.getItem("theme")) {
   if (localStorage.getItem("theme") === "light") {
     document.body.dataset.theme = "light";
+    themeIcon.classList.add("fa-moon");
+    themeIcon.classList.remove("fa-sun");
+    themeIcon.classList.add("move");
   } else if (localStorage.getItem("theme") === "dark") {
     document.body.dataset.theme = "dark";
+    themeIcon.classList.remove("fa-moon");
+    themeIcon.classList.add("fa-sun");
+    themeIcon.classList.add("move");
   }
-  changeIcon();
 }
 
 themeContainer.addEventListener("click", () => {
-  console.log(document.body.dataset.theme === "light");
   if (
     document.body.dataset.theme === "light" ||
     document.body.dataset.theme === undefined
   ) {
-    console.log("light inside");
     document.body.dataset.theme = "dark";
     localStorage.setItem("theme", "dark");
   } else if (document.body.dataset.theme === "dark") {
