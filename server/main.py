@@ -58,39 +58,79 @@ def padding(img, shape_r, shape_c, channels=3):
 
     return img_padded
 
-def preprocess_images(paths, shape_r, shape_c, pad=True):
-    if pad:
-        ims = np.zeros((len(paths), shape_r, shape_c, 3))
+def preprocess_image(image) :
+    img = np.array(image)
+    preprocessed_img = np.zeros((1, 256, 256, 3))
+    padded_image = padding(img, 256, 256, 3)
+    preprocessed_img[0] = padded_image
+
+    preprocessed_img[:, :, :, 0] -= 103.939
+    preprocessed_img[:, :, :, 1] -= 116.779
+    preprocessed_img[:, :, :, 2] -= 123.68
+
+    return preprocessed_img
+
+def resize_image_with_aspect_ratio(image, target_size=512):
+    # Get the current dimensions of the image
+    height, width = image.shape[:2]
+    
+    # Check if width is greater than height
+    if width > height:
+        # Calculate the new height keeping the aspect ratio
+        new_width = target_size
+        new_height = int((target_size / width) * height)
     else:
-        ims =[]
+        # Calculate the new width keeping the aspect ratio
+        new_height = target_size
+        new_width = int((target_size / height) * width)
+    
+    # Resize the image
+    resized_image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
+    
+    return resized_image
 
-    for i, path in enumerate(paths):
-        original_image = cv2.imread(path)
-        if original_image is None:
-            raise ValueError('Path unreadable: %s' % path)
-        if pad:
-            padded_image = padding(original_image, shape_r, shape_c, 3)
-            ims[i] = padded_image
-        else:
-            original_image = original_image.astype(np.float32)
-            original_image[..., 0] -= 103.939 #############
-            original_image[..., 1] -= 116.779
-            original_image[..., 2] -= 123.68
-            ims.append(original_image)
-            # ims = np.array(ims)
-            print('ims.shape in preprocess_imgs',ims.shape)
+def apply_colormap_to_heatmap(heatmap):
+    heatmap = np.maximum(heatmap, 0)  # Ensure all values are positive
+    heatmap /= heatmap.max()  # Normalize between 0 and 1
+    heatmap = np.uint8(255 * heatmap)  # Scale to [0, 255]
+    heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
+    return heatmap
 
-    if pad:
-        ims[:, :, :, 0] -= 103.939
-        ims[:, :, :, 1] -= 116.779
-        ims[:, :, :, 2] -= 123.68
+def crop_image_to_dimension(image, target_value, dim='width'):
+    height, width = image.shape[:2]
+    
+    if dim == 'width':
+        # If the target value is greater than the current width, no cropping is done
+        if target_value >= width:
+            return image
+        
+        # Calculate how much to crop from each side
+        crop_amount = (width - target_value) // 2
+        
+        # Crop the image by keeping the center and removing equally from left and right
+        cropped_image = image[:, crop_amount:width-crop_amount]
+    
+    elif dim == 'height':
+        # If the target value is greater than the current height, no cropping is done
+        if target_value >= height:
+            return image
+        
+        # Calculate how much to crop from the top and bottom
+        crop_amount = (height - target_value) // 2
+        
+        # Crop the image by keeping the center and removing equally from top and bottom
+        cropped_image = image[crop_amount:height-crop_amount, :]
+    
+    return cropped_image
 
-    return ims
-
-def overlay_heatmap_on_image(original_image, heatmap):
-    # Overlay the heatmap on the original image
-    superimposed_img = cv2.addWeighted(original_image, 0.6, heatmap, 0.4, 0)
-    return superimposed_img
+def resize_heatmap_to_original_image(heatmap, original_image):
+    img = np.array(original_image)
+    img = resize_image_with_aspect_ratio(img)
+    height, width,c = img.shape
+    if(width > height):
+        return crop_image_to_dimension(heatmap, height, "height")
+    elif(height > width):
+        return crop_image_to_dimension(heatmap, width, "width")
 
 
 app = FastAPI()
@@ -112,34 +152,21 @@ async def upload_image(file: UploadFile = File(...)):
     if image.mode != 'RGB':
         image = image.convert('RGB')
 
-    img = np.array(image)
-    
-
-    ims = np.zeros((1, 256, 256, 3))
-    padded_image = padding(img, 256, 256, 3)
-    ims[0] = padded_image
-
-    ims[:, :, :, 0] -= 103.939
-    ims[:, :, :, 1] -= 116.779
-    ims[:, :, :, 2] -= 123.68
-
+    # image preprocessing
+    preprocessed_img = preprocess_image(image)
 
     # Step 4: Predict using the model 3s
-    preds = heatmap3s_model.predict(ims)
-    preds_map = preds[0][0]
+    predicited_heatmap = heatmap3s_model.predict(preprocessed_img)[0][0]
 
     # Step 4: Resize the preds_map to match the original image size
-    heatmap = cv2.resize(preds_map, (512, 512))
+    resized_heatmap = resize_heatmap_to_original_image(predicited_heatmap, image)
 
     # Step 5: Normalize and apply colormap to the heatmap
-    heatmap = np.maximum(heatmap, 0)  # Ensure all values are positive
-    heatmap /= heatmap.max()  # Normalize between 0 and 1
-    heatmap = np.uint8(255 * heatmap)  # Scale to [0, 255]
-    heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
+    colored_heatmap = apply_colormap_to_heatmap(resized_heatmap)
 
     
     # Step 6: Convert the result to bytes and return it
-    _, img_encoded = cv2.imencode('.png', heatmap)
+    _, img_encoded = cv2.imencode('.png', colored_heatmap)
     img_bytes = io.BytesIO(img_encoded.tobytes())
     
     return StreamingResponse(img_bytes, media_type="image/png")
@@ -153,34 +180,21 @@ async def upload_image(file: UploadFile = File(...)):
     if image.mode != 'RGB':
         image = image.convert('RGB')
 
-    img = np.array(image)
-    
-
-    ims = np.zeros((1, 256, 256, 3))
-    padded_image = padding(img, 256, 256, 3)
-    ims[0] = padded_image
-
-    ims[:, :, :, 0] -= 103.939
-    ims[:, :, :, 1] -= 116.779
-    ims[:, :, :, 2] -= 123.68
-
+    # image preprocessing
+    preprocessed_img = preprocess_image(image)
 
     # Step 4: Predict using the model 3s
-    preds = heatmap7s_model.predict(ims)
-    preds_map = preds[0][0]
+    predicited_heatmap = heatmap7s_model.predict(preprocessed_img)[0][0]
 
     # Step 4: Resize the preds_map to match the original image size
-    heatmap = cv2.resize(preds_map, (512, 512))
+    resized_heatmap = resize_heatmap_to_original_image(predicited_heatmap, image)
 
     # Step 5: Normalize and apply colormap to the heatmap
-    heatmap = np.maximum(heatmap, 0)  # Ensure all values are positive
-    heatmap /= heatmap.max()  # Normalize between 0 and 1
-    heatmap = np.uint8(255 * heatmap)  # Scale to [0, 255]
-    heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
+    colored_heatmap = apply_colormap_to_heatmap(resized_heatmap)
 
     
     # Step 6: Convert the result to bytes and return it
-    _, img_encoded = cv2.imencode('.png', heatmap)
+    _, img_encoded = cv2.imencode('.png', colored_heatmap)
     img_bytes = io.BytesIO(img_encoded.tobytes())
     
     return StreamingResponse(img_bytes, media_type="image/png")
