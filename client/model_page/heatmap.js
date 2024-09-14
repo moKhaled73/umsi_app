@@ -10,6 +10,7 @@ const closeBtn = document.querySelector(".container .close");
 const generateBtn = document.querySelector("main .generate");
 let selectedImage = null;
 let selectedTab = "heatmap";
+let selectedSlider = null;
 
 const helps = document.querySelectorAll(".tabs li .help");
 const dialog = document.querySelector(".dialog");
@@ -93,6 +94,17 @@ function addOneOriginalImage(imageName, className) {
   const img = document.createElement("img");
   img.className = "original-image";
   img.src = URL.createObjectURL(selectedImage);
+  img.draggable = false;
+  img.onload = () => {
+    console.log(img.naturalWidth, img.naturalHeight);
+    if (img.naturalWidth >= img.naturalHeight) {
+      image.style.width = "512px";
+      image.style.height = `${(512 / img.naturalWidth) * img.naturalHeight}px`;
+    } else {
+      image.style.width = `${(512 / img.naturalHeight) * img.naturalWidth}px`;
+      image.style.height = "512px";
+    }
+  };
   image.appendChild(img);
 
   // append image container to images container
@@ -128,16 +140,31 @@ closeBtn.addEventListener("click", () => {
 
 function addHeatmapOrScanpathImage(imgUrl, classname) {
   const image = document.createElement("img");
+  image.draggable = false;
   image.className =
     selectedTab === "heatmap"
       ? "result-image heatmap-image"
       : "result-image scanpath-image";
   image.src = imgUrl;
+
+  const info = document.querySelector(`.container .images .${classname} .info`);
+  // display and hide heatmap or scanpath
   const toggleImageIcon = document.createElement("i");
   toggleImageIcon.className = "fa-solid fa-eye";
+  info.appendChild(toggleImageIcon);
+  // downlaod heatmap or scanpaht
+  const downloadIcon = document.createElement("i");
+  downloadIcon.className = "fa-solid fa-download";
+  info.appendChild(downloadIcon);
+
+  const slider = document.createElement("img");
+  slider.className = "slider";
+  slider.src = "./move.png";
+  slider.draggable = false;
+
   document
-    .querySelector(`.container .images .${classname} .info`)
-    .appendChild(toggleImageIcon);
+    .querySelector(`.container .images .${classname}`)
+    .appendChild(slider);
   document.querySelector(`.container .images .${classname}`).appendChild(image);
 
   toggleImageIcon.addEventListener("click", (e) => {
@@ -145,6 +172,65 @@ function addHeatmapOrScanpathImage(imgUrl, classname) {
     e.target.classList.toggle("fa-eye-slash");
     e.target.parentNode.parentNode.lastElementChild.classList.toggle("hide");
   });
+
+  downloadIcon.addEventListener("click", (e) => {
+    const canvas = document.createElement("canvas");
+    let ctx = canvas.getContext("2d");
+    // Load the original image
+    const originalImage = document.createElement("img");
+    originalImage.src = URL.createObjectURL(selectedImage);
+
+    originalImage.onload = () => {
+      // Set the canvas size based on the original image dimensions
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+
+      // Draw the original image onto the canvas
+      ctx.drawImage(
+        originalImage,
+        0,
+        0,
+        image.naturalWidth,
+        image.naturalHeight
+      );
+
+      // Set opacity for the heatmap
+      ctx.globalAlpha = 0.5;
+
+      ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
+
+      // Reset global alpha to default (1) after drawing
+      ctx.globalAlpha = 1.0;
+
+      // Create a download link for the merged image
+      let link = document.createElement("a");
+      link.download = "merged-image.png";
+      link.href = canvas.toDataURL(); // Convert canvas to data URL
+      link.click();
+    };
+  });
+}
+
+function moveSlider(e) {
+  const slider = selectedSlider;
+  const container = selectedSlider.parentNode;
+  const topImage = selectedSlider.parentNode.lastElementChild;
+
+  const containerRect = container.getBoundingClientRect();
+  let x = containerRect.right - e.clientX;
+
+  // Ensure the slider does not go outside the container
+  if (x < 0) {
+    x = 0; // Prevent moving outside the left boundary
+  } else if (x > containerRect.width) {
+    x = containerRect.width;
+  }
+
+  // Set the position of the slider
+  slider.style.right = `${x}px`;
+
+  // Clip the top image based on the slider position
+  topImage.style.clipPath = `inset(0 ${x}px 0 0)`;
 }
 
 // call api and display heatmap
@@ -172,6 +258,18 @@ async function generateHeatmap() {
 
     addHeatmapOrScanpathImage(imageUrl3s, "heatmap3s");
     addHeatmapOrScanpathImage(imageUrl7s, "heatmap7s");
+
+    document
+      .querySelectorAll(".container .images .image .slider")
+      .forEach((slider) => {
+        slider.addEventListener("mousedown", (e) => {
+          selectedSlider = e.target;
+          document.addEventListener("mousemove", moveSlider);
+          document.addEventListener("mouseup", () => {
+            document.removeEventListener("mousemove", moveSlider);
+          });
+        });
+      });
 
     generateBtn.innerHTML = "Try again";
   } catch (error) {
@@ -267,16 +365,53 @@ helps.forEach((help) =>
   })
 );
 
-function adjustHeight() {
-  if (container.offsetWidth < 512) {
-    container.style.flexBasis = `${container.offsetWidth}px`;
-  } else {
-    container.style.flexBasis = "512px";
-    container.style.minWidth = "512px";
-  }
-}
-// Run on page load
-window.onload = adjustHeight;
+// function adjustHeight() {
+//   if (container.offsetWidth < 512) {
+//     container.style.flexBasis = `${container.offsetWidth}px`;
+//   } else {
+//     container.style.flexBasis = "512px";
+//     container.style.minWidth = "512px";
+//   }
+// }
+// // Run on page load
+// window.onload = adjustHeight;
 
-// Run on window resize
-window.onresize = adjustHeight;
+// // Run on window resize
+// window.onresize = adjustHeight;
+
+let themeContainer = document.querySelector(".theme-container");
+let themeIcon = document.querySelector(".theme");
+
+function changeIcon() {
+  themeIcon.classList.remove("move");
+  setTimeout(() => {
+    themeIcon.classList.toggle("fa-moon");
+    themeIcon.classList.toggle("fa-sun");
+  }, 500);
+  themeIcon.classList.add("move");
+}
+
+if (localStorage.getItem("theme")) {
+  if (localStorage.getItem("theme") === "light") {
+    document.body.dataset.theme = "light";
+  } else if (localStorage.getItem("theme") === "dark") {
+    document.body.dataset.theme = "dark";
+  }
+  changeIcon();
+}
+
+themeContainer.addEventListener("click", () => {
+  console.log(document.body.dataset.theme === "light");
+  if (
+    document.body.dataset.theme === "light" ||
+    document.body.dataset.theme === undefined
+  ) {
+    console.log("light inside");
+    document.body.dataset.theme = "dark";
+    localStorage.setItem("theme", "dark");
+  } else if (document.body.dataset.theme === "dark") {
+    document.body.dataset.theme = "light";
+    localStorage.setItem("theme", "light");
+  }
+  changeIcon();
+});

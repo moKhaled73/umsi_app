@@ -1,21 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InsightGaze</title>
+    <link rel="icon" href="images/photo_2024-08-19_04-44-35.jpg" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@200;300;400;500;600;700;800&#038;display=swap"
+      rel="stylesheet"
+    />
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>InsightGaze</title>
-  <link rel="icon" href="images/photo_2024-08-19_04-44-35.jpg" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@200;300;400;500;600;700;800&#038;display=swap"
-    rel="stylesheet" />
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
-    integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!-- Render All Elements Normally -->
-  <link rel="stylesheet" href="heatmap.css" />
-</head>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+      integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <!-- Render All Elements Normally -->
+    <link rel="stylesheet" href="heatmap.css" />
+  </head>
 
   <body>
     <!--start header-->
@@ -51,6 +56,9 @@
           </li>
         </ul>
         <div class="buttons">
+          <div class="theme-container">
+            <i class="fa-solid fa-moon theme"></i>
+          </div>
           <button class="login">log in</button>
           <button class="signup">sign up</button>
         </div>
@@ -92,13 +100,12 @@
           <i class="close fa-solid fa-circle-xmark"></i>
         </div>
 
-      <button class="generate">Generate</button>
-    </section>
+        <button class="generate">Generate</button>
+      </section>
 
-    <div class="dialog"></div>
-  </main>
-  <!-- end model  -->
-  <script src="heatmap.js"></script>
-</body>
-
+      <div class="dialog"></div>
+    </main>
+    <!-- end model  -->
+    <script src="heatmap.js"></script>
+  </body>
 </html>

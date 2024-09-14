@@ -9,6 +9,15 @@
 :root {
   --main-color: #ea580c;
   --secondary-color: orange;
+  --white-background: white;
+  --gray-background: #eee;
+  --link-color: #666;
+}
+
+body[data-theme="dark"] {
+  --white-background: #111;
+  --gray-background: #222;
+  --link-color: #eee;
 }
 
 ul {
@@ -27,13 +36,14 @@ header {
   top: 0;
   left: 0;
   z-index: 999;
-  background-color: white;
+  background-color: var(--white-background);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
   max-width: 100%;
 }
+/* logo */
 .img {
   width: 70px;
   display: flex;
@@ -47,6 +57,8 @@ header {
     font-size: 20px;
   }
 }
+
+/* navigations */
 .links {
   position: relative;
   display: flex;
@@ -73,12 +85,13 @@ header {
         text-transform: capitalize;
         font-size: 16px;
         font-weight: 600;
-        color: #666;
+        color: var(--link-color);
       }
     }
   }
   .buttons {
     display: flex;
+    align-items: center;
     gap: 20px;
     .login {
       width: 130px;
@@ -112,11 +125,42 @@ header {
       transition: all 0.3s ease-in-out;
       transform: scale(1.1);
     }
+    .theme-container {
+      position: relative;
+      transition: all 0.3s linear;
+      border: 2px solid rgb(61, 60, 60);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 46px;
+      height: 23px;
+      cursor: pointer;
+      .theme {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 2px;
+        transition: all 0.3s;
+        color: var(--link-color);
+      }
+
+      .fa-sun.move {
+        transform: translate(20px, 0px) rotate(360deg);
+      }
+
+      .fa-moon.move {
+        transform: translate(0px, 0px) rotate(-360deg);
+      }
+    }
   }
 }
+
+/* dispaly menu icon */
 .menu {
   display: none;
 }
+
 @media (max-width: 1200px) {
   .links {
     flex: 0.8;
@@ -128,6 +172,7 @@ header {
     }
   }
 }
+
 @media (max-width: 990px) {
   .links {
     position: fixed;
@@ -185,7 +230,7 @@ header {
 /* start model */
 main {
   min-height: calc(100vh - 85px);
-  background-color: #eee;
+  background-color: var(--gray-background);
   padding: 10px 20px;
 
   .tabs {
@@ -203,7 +248,8 @@ main {
       cursor: pointer;
       display: flex;
       align-items: center;
-      background-color: white;
+      background-color: var(--white-background);
+      color: var(--link-color);
 
       span {
         padding: 6px 12px;
@@ -285,14 +331,14 @@ main {
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    background-color: white;
-    flex-basis: 512px;
-    min-width: 512px;
+    background-color: var(--white-background);
+    /* flex-basis: 512px;
+    min-width: 512px; */
     margin: 0 auto;
 
     .upload {
-      width: 100%;
-      height: 100%;
+      width: 512px;
+      height: 512px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -318,12 +364,13 @@ main {
 
     .images {
       display: none;
-      gap: 5px;
+      padding: 10px;
+      gap: 10px;
 
       .image {
-        width: 512px;
-        height: 512px;
+        background: var(--gray-background);
         position: relative;
+        overflow: hidden;
 
         .info {
           position: absolute;
@@ -345,7 +392,22 @@ main {
             padding: 6px;
             color: white;
             border-radius: 3px;
+            cursor: pointer;
           }
+        }
+
+        .slider {
+          position: absolute;
+          right: 0;
+          top: 50%;
+          transform: translate(50%, -50%);
+          z-index: 3;
+          background-color: white;
+          width: 30px;
+          height: 30px;
+          padding: 3px;
+          border-radius: 50%;
+          cursor: ew-resize;
         }
 
         .original-image {
@@ -355,13 +417,16 @@ main {
           object-fit: contain;
           width: 100%;
           height: 100%;
+          user-select: none;
         }
-        .heatmap-image {
+        .result-image {
           position: absolute;
           top: 0;
           left: 0;
+          object-fit: contain;
           width: 100%;
           height: 100%;
+          user-select: none;
         }
         .result-image.hide {
           display: none;
