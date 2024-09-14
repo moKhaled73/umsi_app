@@ -97,10 +97,15 @@ function changeIcon() {
 if (localStorage.getItem("theme")) {
   if (localStorage.getItem("theme") === "light") {
     document.body.dataset.theme = "light";
+    themeIcon.classList.add("fa-moon");
+    themeIcon.classList.remove("fa-sun");
+    themeIcon.classList.add("move");
   } else if (localStorage.getItem("theme") === "dark") {
     document.body.dataset.theme = "dark";
+    themeIcon.classList.remove("fa-moon");
+    themeIcon.classList.add("fa-sun");
+    themeIcon.classList.add("move");
   }
-  changeIcon();
 }
 
 themeContainer.addEventListener("click", () => {
