@@ -482,35 +482,35 @@ header {
 /*end header*/
 /* start model */
 main {
-  min-height: calc(100vh - 85px);
   background-color: var(--gray-background);
   padding: 10px 20px;
+}
 
-  .tabs {
+/* start tabs */
+main .tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  border-bottom: 2px solid var(--main-color);
+  margin-left: 0;
+
+  li {
+    border: 2px solid var(--main-color);
+    border-bottom: none;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    transition: all 0.3s;
+    cursor: pointer;
     display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-    border-bottom: 2px solid var(--main-color);
-    margin-left: 0;
+    align-items: center;
+    background-color: var(--white-background);
+    color: var(--link-color);
+    padding: 5px 15px;
 
-    li {
-      border: 2px solid var(--main-color);
-      border-bottom: none;
-      border-top-left-radius: 5px;
-      border-top-right-radius: 5px;
-      transition: all 0.3s;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      background-color: var(--white-background);
-      color: var(--link-color);
-      padding: 5px 15px;
-
-      &:hover,
-      &.active {
-        background-color: var(--main-color);
-        color: #f0f0f0;
-      }
+    &:hover,
+    &.active {
+      background-color: var(--main-color);
+      color: #f0f0f0;
     }
   }
 }
@@ -525,200 +525,221 @@ main {
         border: 1px solid var(--main-color);
         border-bottom: none;
         font-size: 12px;
-
-        span {
-          padding: 3px 6px;
-        }
-
-        i {
-          padding-right: 3px;
-        }
       }
     }
   }
 }
 
-.model {
+/* end tabs */
+
+main .model {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
 
-  .error {
-    padding: 6px 12px;
-    background-color: #ff4d4f;
-    color: white;
-    font-size: 18px;
-    display: none;
+/* error alert */
+main .model .error {
+  padding: 6px 12px;
+  background-color: #ff4d4f;
+  color: white;
+  font-size: 18px;
+  display: none;
+  align-items: center;
+  gap: 5px;
+
+  i {
+    display: flex;
     align-items: center;
-    gap: 5px;
-
-    i {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 25px;
-      height: 25px;
-      border: 1px solid white;
-      border-radius: 50%;
-      text-align: center;
-      font-size: 14px;
-    }
-
-    p {
-      background-color: inherit;
-      color: inherit;
-    }
+    justify-content: center;
+    width: 25px;
+    height: 25px;
+    border: 1px solid white;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 14px;
   }
 
-  .container {
-    border: 2px dashed var(--main-color);
-    border-radius: 10px;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    background-color: var(--white-background);
-    margin: 0 auto;
-
-    .upload {
-      width: 512px;
-      height: 512px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-
-      #image-file {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        cursor: pointer;
-      }
-
-      p {
-        font-size: 25px;
-        font-style: italic;
-        font-weight: bold;
-        color: #777;
-      }
-    }
-
-    .images {
-      display: none;
-      padding: 10px;
-      gap: 60px;
-
-      .divider {
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 2px;
-        height: 100%;
-        background: var(--main-color);
-        display: block;
-      }
-
-      .image {
-        background: var(--gray-background);
-        position: relative;
-        overflow: hidden;
-
-        .info {
-          position: absolute;
-          top: 5px;
-          left: 5px;
-          z-index: 5;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-
-          span {
-            background-color: var(--main-color);
-            color: white;
-            padding: 3px 6px;
-            border-radius: 3px;
-          }
-
-          i {
-            background-color: var(--main-color);
-            padding: 6px 8px;
-            text-align: center;
-            color: white;
-            border-radius: 3px;
-            cursor: pointer;
-          }
-        }
-
-        .slider {
-          position: absolute;
-          right: 0;
-          top: 50%;
-          transform: translate(50%, -50%);
-          z-index: 3;
-          background-color: white;
-          width: 30px;
-          height: 30px;
-          padding: 3px;
-          border-radius: 50%;
-          cursor: ew-resize;
-        }
-
-        .original-image {
-          position: absolute;
-          top: 0;
-          left: 0;
-          object-fit: contain;
-          width: 100%;
-          height: 100%;
-          user-select: none;
-        }
-
-        .result-image {
-          position: absolute;
-          top: 0;
-          left: 0;
-          object-fit: contain;
-          width: 100%;
-          height: 100%;
-          user-select: none;
-        }
-
-        .result-image.hide {
-          display: none;
-        }
-
-        .heatmap-image {
-          opacity: 0;
-          animation: fadeIn 5s forwards;
-        }
-
-        .scanpath-image {
-          object-fit: contain;
-        }
-      }
-    }
-
-    .close {
-      display: none;
-      position: absolute;
-      top: 0px;
-      right: 0px;
-      font-size: 28px;
-      color: red;
-      z-index: 5;
-      cursor: pointer;
-      background-color: white;
-      border-radius: 50%;
-      border: none;
-    }
+  p {
+    background-color: inherit;
+    color: inherit;
   }
 }
 
+/* image container */
+main .model .container {
+  border: 2px dashed var(--main-color);
+  border-radius: 10px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background-color: var(--white-background);
+  margin: 0 auto;
+
+  .upload {
+    width: 512px;
+    height: 512px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+
+    #image-file {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    p {
+      font-size: 25px;
+      font-style: italic;
+      font-weight: bold;
+      color: #777;
+    }
+  }
+
+  .images {
+    display: none;
+    padding: 10px;
+    gap: 60px;
+
+    .divider {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 100%;
+      background: var(--main-color);
+      display: block;
+    }
+
+    .image {
+      background: var(--gray-background);
+      position: relative;
+      overflow: hidden;
+
+      .info {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        span {
+          background-color: var(--main-color);
+          color: white;
+          padding: 3px 6px;
+          border-radius: 3px;
+        }
+
+        i {
+          background-color: var(--main-color);
+          padding: 6px 8px;
+          text-align: center;
+          color: white;
+          border-radius: 3px;
+          cursor: pointer;
+        }
+      }
+
+      .slider {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translate(50%, -50%);
+        z-index: 3;
+        background-color: white;
+        width: 30px;
+        height: 30px;
+        padding: 3px;
+        border-radius: 50%;
+        cursor: ew-resize;
+      }
+
+      .original-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        object-fit: contain;
+        width: 100%;
+        height: 100%;
+        user-select: none;
+      }
+
+      .result-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        object-fit: contain;
+        width: 100%;
+        height: 100%;
+        user-select: none;
+      }
+
+      .result-image.hide {
+        display: none;
+      }
+
+      .heatmap-image {
+        opacity: 0;
+        animation: fadeIn 5s forwards;
+      }
+
+      .scanpath-image {
+        object-fit: contain;
+      }
+    }
+  }
+
+  .close {
+    display: none;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    font-size: 28px;
+    color: red;
+    z-index: 5;
+    cursor: pointer;
+    background-color: white;
+    border-radius: 50%;
+    border: none;
+  }
+}
+
+@media (max-width: 1150px) {
+  main .model .container .images {
+    flex-direction: column;
+  }
+  main .model .container .images .divider {
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 2px;
+    width: 100%;
+  }
+}
+
+/* heatmap fadeIn */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 0.5;
+  }
+}
+
+/* generate button */
 main .generate {
   background-color: var(--main-color);
   border: none;
@@ -746,6 +767,23 @@ main .generate {
   }
 }
 
+@media (max-width: 600px) {
+  main .model .container {
+    width: 100%;
+  }
+  main .model .container .images {
+    width: 100%;
+  }
+  main .model .container .images .image {
+    width: 100% !important;
+  }
+
+  main .generate {
+    width: 100%;
+  }
+}
+
+/* loading */
 @keyframes rotate {
   0% {
     rotate: 0;
@@ -756,40 +794,7 @@ main .generate {
   }
 }
 
-@media (max-width: 512px) {
-  .model {
-    .container {
-      width: 100% !important;
-
-      .upload {
-        p {
-          font-size: 16px;
-        }
-      }
-
-      .image-container {
-        width: 100%;
-        height: 100%;
-      }
-    }
-  }
-
-  main .generate {
-    width: 100%;
-  }
-}
-
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 0.5;
-    /* Final opacity of 0.5 */
-  }
-}
-
+/* dialog for display model info */
 .dialog {
   position: absolute;
   top: 0;
