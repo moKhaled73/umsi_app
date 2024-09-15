@@ -9,7 +9,6 @@ const images = document.querySelector(".container .images");
 const closeBtn = document.querySelector(".container .close");
 const generateBtn = document.querySelector("main .generate");
 
-const helps = document.querySelectorAll(".tabs li .help");
 const dialog = document.querySelector(".dialog");
 
 // api links
@@ -24,6 +23,9 @@ const searchParamTab = searchParams.get("tab");
 
 // global variable
 let selectedImage = null;
+let selectedHeatmap3s = null;
+let selectedHeatmap7s = null;
+let selectedScanpath = null;
 let selectedTab = "heatmap";
 let selectedSlider = null;
 
@@ -53,9 +55,11 @@ function hideLinks() {
 // updated generate btn
 function updataGenerateBtnText() {
   if (selectedTab === "heatmap") {
-    generateBtn.innerHTML = `Generate Heatmap`;
+    if (selectedHeatmap3s) generateBtn.innerHTML = "Try again";
+    else generateBtn.innerHTML = `Generate Heatmap`;
   } else if (selectedTab === "scanpath") {
-    generateBtn.innerHTML = "Generate Scanpath";
+    if (selectedScanpath) generateBtn.innerHTML = "Try again";
+    else generateBtn.innerHTML = "Generate Scanpath";
   }
 }
 updataGenerateBtnText();
@@ -66,6 +70,15 @@ function updateActiveTab(tab) {
   selectedTab = tab.dataset.modelname;
   updataGenerateBtnText();
   addOriginalImages();
+  if (selectedHeatmap3s && selectedTab === "heatmap")
+    addHeatmapOrScanpathImage("heatmap3s");
+
+  if (selectedHeatmap7s && selectedTab === "heatmap")
+    addHeatmapOrScanpathImage("heatmap7s");
+
+  if (selectedScanpath && selectedTab === "scanpath") {
+    addHeatmapOrScanpathImage("scanpath");
+  }
 }
 
 // active tabs
@@ -175,6 +188,9 @@ function addOriginalImages() {
     images.innerHTML = "";
     if (selectedTab === "heatmap") {
       addOneOriginalImage("heatmap3s", "heatmap3s");
+      const divider = document.createElement("span");
+      divider.className = "divider";
+      images.appendChild(divider);
       addOneOriginalImage("heatmap7s", "heatmap7s");
     } else if (selectedTab === "scanpath") {
       addOneOriginalImage("scanpath", "scanpath");
@@ -259,14 +275,19 @@ function moveSlider(e) {
   topImage.style.clipPath = `inset(0 ${x}px 0 0)`;
 }
 
-function addHeatmapOrScanpathImage(imgUrl, classname) {
+function addHeatmapOrScanpathImage(classname) {
   const reslutImage = document.createElement("img");
   reslutImage.draggable = false;
   reslutImage.className =
     selectedTab === "heatmap"
       ? "result-image heatmap-image"
       : "result-image scanpath-image";
-  reslutImage.src = imgUrl;
+  reslutImage.src =
+    classname === "heatmap3s"
+      ? selectedHeatmap3s
+      : classname === "heatmap7s"
+      ? selectedHeatmap7s
+      : selectedScanpath;
 
   const info = document.querySelector(`.container .images .${classname} .info`);
 
@@ -315,6 +336,7 @@ async function generateHeatmap() {
     });
     const blob3s = await res3s.blob();
     const imageUrl3s = URL.createObjectURL(blob3s);
+    selectedHeatmap3s = imageUrl3s;
 
     // call api for 7s
     const res7s = await fetch(HEATMAP7S_API_URL, {
@@ -323,9 +345,10 @@ async function generateHeatmap() {
     });
     const blob7s = await res7s.blob();
     const imageUrl7s = URL.createObjectURL(blob7s);
+    selectedHeatmap7s = imageUrl7s;
 
-    addHeatmapOrScanpathImage(imageUrl3s, "heatmap3s");
-    addHeatmapOrScanpathImage(imageUrl7s, "heatmap7s");
+    addHeatmapOrScanpathImage("heatmap3s");
+    addHeatmapOrScanpathImage("heatmap7s");
 
     generateBtn.innerHTML = "Try again";
   } catch (error) {
@@ -348,8 +371,9 @@ async function generateScanpath() {
     });
     const blob = await res.blob();
     const scanpathUrl = URL.createObjectURL(blob);
+    selectedScanpath = scanpathUrl;
 
-    addHeatmapOrScanpathImage(scanpathUrl, "scanpath");
+    addHeatmapOrScanpathImage("scanpath");
 
     generateBtn.innerHTML = "Try again";
   } catch (error) {
@@ -388,6 +412,10 @@ generateBtn.addEventListener("click", () => {
     closeBtn.style.display = "none";
     upload.style.display = "flex";
     imageFile.value = "";
+    selectedImage = null;
+    selectedHeatmap3s = null;
+    selectedHeatmap7s = null;
+    selectedScanpath = null;
     updataGenerateBtnText();
   } else {
     if (selectedTab === "heatmap") {
