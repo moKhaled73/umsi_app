@@ -1,5 +1,5 @@
 const links = document.querySelector(".links");
-const tabs = document.querySelectorAll(".tabs li span");
+const tabs = document.querySelectorAll(".tabs li");
 
 const error = document.querySelector(".model .error");
 const container = document.querySelector(".container");
@@ -8,33 +8,41 @@ const imageFile = document.getElementById("image-file");
 const images = document.querySelector(".container .images");
 const closeBtn = document.querySelector(".container .close");
 const generateBtn = document.querySelector("main .generate");
-let selectedImage = null;
-let selectedTab = "heatmap";
-let selectedSlider = null;
 
 const helps = document.querySelectorAll(".tabs li .help");
 const dialog = document.querySelector(".dialog");
 
+// api links
 const HEATMAP3S_API_URL = "http://127.0.0.1:8000/heatmap3s/upload";
 const HEATMAP7S_API_URL = "http://127.0.0.1:8000/heatmap7s/upload";
 const SCANPATH_API_URL = "http://127.0.0.1:8000/scanpath/upload";
 
+// get active tab from search params
 const url = window.location.search;
 const searchParams = new URLSearchParams(url);
-const SPTab = searchParams.get("tab");
+const searchParamTab = searchParams.get("tab");
+
+// global variable
+let selectedImage = null;
+let selectedTab = "heatmap";
+let selectedSlider = null;
 
 const helpsContent = {
-  heatmap: {
-    title: "heatmap",
-    desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab quia suscipit amet pariatur sequi vero",
+  heatmap3s: {
+    title: "Heatmap 3s",
+    desc: "This feature prioritizes fast response. It is designed to be most effective when speed is essential or the design is less elemental like landing page or banner designs that contain headers or mostly like that.",
+  },
+  heatmap7s: {
+    title: "Heatmap 7s",
+    desc: "This feature is provided for cases where the design is complex, when the user requires a deeper understanding of the design, or when multiple elements need to be thoroughly reviewed.",
   },
   scanpath: {
-    title: "scanpath",
-    desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab quia suscipit amet pariatur sequi vero",
+    title: "Scanpath",
+    desc: "This feature shows the path that the user's eye will follow or the transitions that the eye will make. Therefore, it shows the interface designer how the user will receive the design.",
   },
 };
 
-// nav bar
+// show or hide nav bar
 function showLinks() {
   links.classList.remove("hide");
 }
@@ -52,42 +60,90 @@ function updataGenerateBtnText() {
 }
 updataGenerateBtnText();
 
+function updateActiveTab(tab) {
+  tabs.forEach((tab) => tab.classList.remove("active"));
+  tab.classList.add("active");
+  selectedTab = tab.dataset.modelname;
+  updataGenerateBtnText();
+  addOriginalImages();
+}
+
 // active tabs
 tabs.forEach((tab) => {
+  // update active tab when click and generate button and add original image
   tab.addEventListener("click", (e) => {
-    tabs.forEach((tab) => tab.parentNode.classList.remove("active"));
-    e.target.parentNode.classList.add("active");
-    selectedTab = e.target.parentNode.lastElementChild.dataset.modelname;
-    updataGenerateBtnText();
-    addOriginalImages();
+    updateActiveTab(e.target);
   });
-  if (tab.parentNode.lastElementChild.dataset.modelname === SPTab) {
-    tabs.forEach((tab) => tab.parentNode.classList.remove("active"));
-    tab.parentNode.classList.add("active");
-    selectedTab = tab.parentNode.lastElementChild.dataset.modelname;
-    updataGenerateBtnText();
-    addOriginalImages();
+
+  // update tab based on search params
+  if (tab.dataset.modelname === searchParamTab) {
+    updateActiveTab(tab);
   }
-  if (tab.parentNode.classList.contains("active")) {
-    selectedTab = tab.parentNode.lastElementChild.dataset.modelname;
+  if (tab.classList.contains("active")) {
+    selectedTab = tab.dataset.modelname;
   }
 });
 
+// display help
+function displayHelp(name) {
+  // create container
+  const container = document.createElement("div");
+  container.className = "container";
+  // create title and close btn
+  const titleContainer = document.createElement("div");
+  titleContainer.className = "title-container";
+  const title = document.createElement("h4");
+  title.innerHTML = helpsContent[`${name}`].title;
+  const closeBtn = document.createElement("i");
+  closeBtn.className = "close fa-solid fa-circle-xmark";
+  titleContainer.appendChild(title);
+  titleContainer.appendChild(closeBtn);
+  container.appendChild(titleContainer);
+  // create content
+  const content = document.createElement("p");
+  content.innerHTML = helpsContent[`${name}`].desc;
+  container.appendChild(content);
+  dialog.appendChild(container);
+  dialog.style.display = "flex";
+  closeBtn.addEventListener("click", () => {
+    dialog.innerHTML = "";
+    dialog.style.display = "none";
+  });
+  dialog.addEventListener("click", (e) => {
+    dialog.innerHTML = "";
+    dialog.style.display = "none";
+  });
+  container.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+}
+
+// add one original image
 function addOneOriginalImage(imageName, className) {
   // create image container for original image and image name
   const image = document.createElement("div");
   image.className = `image ${className}`;
 
-  // create info dev and show and hide button
+  // create info dev
   const info = document.createElement("div");
   info.className = "info";
 
-  // create span for image name and append to image container
+  // create span for image name and append to info
   const imageNameSpan = document.createElement("span");
   imageNameSpan.classList = "image-name";
   imageNameSpan.innerHTML = imageName;
   info.appendChild(imageNameSpan);
 
+  // create help icon and append to info
+  const helpIcon = document.createElement("i");
+  helpIcon.className = "fa-solid fa-question";
+  helpIcon.dataset.modelname = className;
+  helpIcon.addEventListener("click", (e) =>
+    displayHelp(e.target.dataset.modelname)
+  );
+  info.appendChild(helpIcon);
+
+  // append info to image container
   image.appendChild(info);
 
   // create original image and append to image container
@@ -96,7 +152,6 @@ function addOneOriginalImage(imageName, className) {
   img.src = URL.createObjectURL(selectedImage);
   img.draggable = false;
   img.onload = () => {
-    console.log(img.naturalWidth, img.naturalHeight);
     if (img.naturalWidth >= img.naturalHeight) {
       image.style.width = "512px";
       image.style.height = `${(512 / img.naturalWidth) * img.naturalHeight}px`;
@@ -105,6 +160,7 @@ function addOneOriginalImage(imageName, className) {
       image.style.height = "512px";
     }
   };
+  // append original image to image container
   image.appendChild(img);
 
   // append image container to images container
@@ -138,77 +194,47 @@ closeBtn.addEventListener("click", () => {
   updataGenerateBtnText();
 });
 
-function addHeatmapOrScanpathImage(imgUrl, classname) {
-  const image = document.createElement("img");
-  image.draggable = false;
-  image.className =
-    selectedTab === "heatmap"
-      ? "result-image heatmap-image"
-      : "result-image scanpath-image";
-  image.src = imgUrl;
+// download reslut image
+function downloadReslutImage(reslutImage, name) {
+  const canvas = document.createElement("canvas");
+  let ctx = canvas.getContext("2d");
+  // Load the original image
+  const originalImage = document.createElement("img");
+  originalImage.src = URL.createObjectURL(selectedImage);
+  originalImage.onload = () => {
+    // Set the canvas size based on the original image dimensions
+    canvas.width = reslutImage.naturalWidth;
+    canvas.height = reslutImage.naturalHeight;
 
-  const info = document.querySelector(`.container .images .${classname} .info`);
-  // display and hide heatmap or scanpath
-  const toggleImageIcon = document.createElement("i");
-  toggleImageIcon.className = "fa-solid fa-eye";
-  info.appendChild(toggleImageIcon);
-  // downlaod heatmap or scanpaht
-  const downloadIcon = document.createElement("i");
-  downloadIcon.className = "fa-solid fa-download";
-  info.appendChild(downloadIcon);
+    // Draw the original image onto the canvas
+    ctx.drawImage(
+      originalImage,
+      0,
+      0,
+      reslutImage.naturalWidth,
+      reslutImage.naturalHeight
+    );
 
-  const slider = document.createElement("img");
-  slider.className = "slider";
-  slider.src = "./move.png";
-  slider.draggable = false;
+    // Set opacity for the heatmap
+    if (/heatmap/.test(name)) ctx.globalAlpha = 0.5;
 
-  document
-    .querySelector(`.container .images .${classname}`)
-    .appendChild(slider);
-  document.querySelector(`.container .images .${classname}`).appendChild(image);
+    ctx.drawImage(
+      reslutImage,
+      0,
+      0,
+      reslutImage.naturalWidth,
+      reslutImage.naturalHeight
+    );
 
-  toggleImageIcon.addEventListener("click", (e) => {
-    e.target.classList.toggle("fa-eye");
-    e.target.classList.toggle("fa-eye-slash");
-    e.target.parentNode.parentNode.lastElementChild.classList.toggle("hide");
-  });
+    // Reset global alpha to default (1) after drawing
+    ctx.globalAlpha = 1.0;
 
-  downloadIcon.addEventListener("click", (e) => {
-    const canvas = document.createElement("canvas");
-    let ctx = canvas.getContext("2d");
-    // Load the original image
-    const originalImage = document.createElement("img");
-    originalImage.src = URL.createObjectURL(selectedImage);
-
-    originalImage.onload = () => {
-      // Set the canvas size based on the original image dimensions
-      canvas.width = image.naturalWidth;
-      canvas.height = image.naturalHeight;
-
-      // Draw the original image onto the canvas
-      ctx.drawImage(
-        originalImage,
-        0,
-        0,
-        image.naturalWidth,
-        image.naturalHeight
-      );
-
-      // Set opacity for the heatmap
-      ctx.globalAlpha = 0.5;
-
-      ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
-
-      // Reset global alpha to default (1) after drawing
-      ctx.globalAlpha = 1.0;
-
-      // Create a download link for the merged image
-      let link = document.createElement("a");
-      link.download = "merged-image.png";
-      link.href = canvas.toDataURL(); // Convert canvas to data URL
-      link.click();
-    };
-  });
+    // Create a download link for the merged image
+    let link = document.createElement("a");
+    link.download = `${name}.png`;
+    link.href = canvas.toDataURL(); // Convert canvas to data URL
+    link.click();
+  };
 }
 
 function moveSlider(e) {
@@ -231,6 +257,48 @@ function moveSlider(e) {
 
   // Clip the top image based on the slider position
   topImage.style.clipPath = `inset(0 ${x}px 0 0)`;
+}
+
+function addHeatmapOrScanpathImage(imgUrl, classname) {
+  const reslutImage = document.createElement("img");
+  reslutImage.draggable = false;
+  reslutImage.className =
+    selectedTab === "heatmap"
+      ? "result-image heatmap-image"
+      : "result-image scanpath-image";
+  reslutImage.src = imgUrl;
+
+  const info = document.querySelector(`.container .images .${classname} .info`);
+
+  // downlaod heatmap or scanpaht
+  const downloadIcon = document.createElement("i");
+  downloadIcon.className = "fa-solid fa-download";
+  downloadIcon.addEventListener("click", (e) =>
+    downloadReslutImage(reslutImage, classname)
+  );
+  info.appendChild(downloadIcon);
+
+  // if adding heatmap add slider
+  if (/heatmap/.test(classname)) {
+    const slider = document.createElement("img");
+    slider.className = "slider";
+    slider.src = "./move.png";
+    slider.draggable = false;
+    slider.addEventListener("mousedown", (e) => {
+      selectedSlider = e.target;
+      document.addEventListener("mousemove", moveSlider);
+      document.addEventListener("mouseup", () => {
+        document.removeEventListener("mousemove", moveSlider);
+      });
+    });
+    document
+      .querySelector(`.container .images .${classname}`)
+      .appendChild(slider);
+  }
+
+  document
+    .querySelector(`.container .images .${classname}`)
+    .appendChild(reslutImage);
 }
 
 // call api and display heatmap
@@ -259,18 +327,6 @@ async function generateHeatmap() {
     addHeatmapOrScanpathImage(imageUrl3s, "heatmap3s");
     addHeatmapOrScanpathImage(imageUrl7s, "heatmap7s");
 
-    document
-      .querySelectorAll(".container .images .image .slider")
-      .forEach((slider) => {
-        slider.addEventListener("mousedown", (e) => {
-          selectedSlider = e.target;
-          document.addEventListener("mousemove", moveSlider);
-          document.addEventListener("mouseup", () => {
-            document.removeEventListener("mousemove", moveSlider);
-          });
-        });
-      });
-
     generateBtn.innerHTML = "Try again";
   } catch (error) {
     updataGenerateBtnText();
@@ -278,6 +334,7 @@ async function generateHeatmap() {
   }
 }
 
+// cal api and display scanpath
 async function generateScanpath() {
   generateBtn.innerHTML = `<span class='loading'></span>`;
   try {
@@ -321,6 +378,7 @@ imageFile.addEventListener("change", (e) => {
   }
 });
 
+// generate heatmap or scan path when click on generate btn
 generateBtn.addEventListener("click", () => {
   if (images.innerHTML === "") {
     displayError("please Upload an image first");
@@ -340,47 +398,9 @@ generateBtn.addEventListener("click", () => {
   }
 });
 
-helps.forEach((help) =>
-  help.addEventListener("click", (e) => {
-    const content = document.createElement("div");
-    content.classList = "content";
-    const title = document.createElement("div");
-    title.classList = "title";
-    const h4 = document.createElement("h4");
-    h4.innerHTML = helpsContent[`${e.currentTarget.dataset.modelname}`].title;
-    const close = document.createElement("i");
-    close.classList = "close fa-solid fa-circle-xmark";
-    title.appendChild(h4);
-    title.appendChild(close);
-    content.appendChild(title);
-    const p = document.createElement("p");
-    p.innerHTML = helpsContent[`${e.currentTarget.dataset.modelname}`].desc;
-    content.appendChild(p);
-    dialog.appendChild(content);
-    dialog.style.display = "flex";
-    close.addEventListener("click", () => {
-      dialog.innerHTML = "";
-      dialog.style.display = "none";
-    });
-  })
-);
-
-// function adjustHeight() {
-//   if (container.offsetWidth < 512) {
-//     container.style.flexBasis = `${container.offsetWidth}px`;
-//   } else {
-//     container.style.flexBasis = "512px";
-//     container.style.minWidth = "512px";
-//   }
-// }
-// // Run on page load
-// window.onload = adjustHeight;
-
-// // Run on window resize
-// window.onresize = adjustHeight;
-
-let themeContainer = document.querySelector(".theme-container");
-let themeIcon = document.querySelector(".theme");
+// theme handling
+const themeContainer = document.querySelector(".theme-container");
+const themeIcon = document.querySelector(".theme");
 
 function changeIcon() {
   themeIcon.classList.remove("move");

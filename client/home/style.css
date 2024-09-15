@@ -778,8 +778,6 @@ footer {
   align-items: center;
   color: white;
   overflow: hidden;
-
-  color: white;
   background: url(../images/photo_2024-08-19_04-44-35.jpg) no-repeat
     center/cover;
 
@@ -869,7 +867,7 @@ footer::before {
   cursor: pointer;
   transition: all 0.3s ease;
   opacity: 1;
-  left: 1px;
+  left: 0;
 }
 
 @media (max-width: 768px) {
