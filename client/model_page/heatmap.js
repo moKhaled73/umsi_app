@@ -387,7 +387,7 @@ function changeIcon() {
   setTimeout(() => {
     themeIcon.classList.toggle("fa-moon");
     themeIcon.classList.toggle("fa-sun");
-  }, 500);
+  }, 100);
   themeIcon.classList.add("move");
 }
 
