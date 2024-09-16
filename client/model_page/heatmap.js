@@ -28,6 +28,8 @@ let selectedHeatmap7s = null;
 let selectedScanpath = null;
 let selectedTab = "heatmap";
 let selectedSlider = null;
+let loadingHeatmapState = false;
+let loadingScanpathState = false;
 
 const helpsContent = {
   heatmap3s: {
@@ -56,10 +58,18 @@ function hideLinks() {
 function updataGenerateBtnText() {
   if (selectedTab === "heatmap") {
     if (selectedHeatmap3s) generateBtn.innerHTML = "Try again";
-    else generateBtn.innerHTML = `Generate Heatmap`;
+    else {
+      if (loadingHeatmapState)
+        generateBtn.innerHTML = `<span class='loading'></span>`;
+      else generateBtn.innerHTML = `Generate Heatmap`;
+    }
   } else if (selectedTab === "scanpath") {
     if (selectedScanpath) generateBtn.innerHTML = "Try again";
-    else generateBtn.innerHTML = "Generate Scanpath";
+    else {
+      if (loadingScanpathState)
+        generateBtn.innerHTML = `<span class='loading'></span>`;
+      else generateBtn.innerHTML = "Generate Scanpath";
+    }
   }
 }
 updataGenerateBtnText();
@@ -199,8 +209,7 @@ function addOriginalImages() {
   }
 }
 
-// remove original image and heatmap
-closeBtn.addEventListener("click", () => {
+function updateContainerWhenCloseOrTryagain() {
   images.innerHTML = "";
   images.style.display = "none";
   closeBtn.style.display = "none";
@@ -211,6 +220,11 @@ closeBtn.addEventListener("click", () => {
   selectedHeatmap7s = null;
   selectedScanpath = null;
   updataGenerateBtnText();
+}
+
+// remove original image and heatmap
+closeBtn.addEventListener("click", () => {
+  updateContainerWhenCloseOrTryagain();
 });
 
 // download reslut image
@@ -327,6 +341,7 @@ function addHeatmapOrScanpathImage(classname) {
 
 // call api and display heatmap
 async function generateHeatmap() {
+  loadingHeatmapState = true;
   generateBtn.innerHTML = `<span class='loading'></span>`;
   try {
     const formData = new FormData();
@@ -353,8 +368,10 @@ async function generateHeatmap() {
     addHeatmapOrScanpathImage("heatmap3s");
     addHeatmapOrScanpathImage("heatmap7s");
 
+    loadingHeatmapState = false;
     generateBtn.innerHTML = "Try again";
   } catch (error) {
+    loadingHeatmapState = false;
     updataGenerateBtnText();
     console.log(error);
   }
@@ -362,6 +379,7 @@ async function generateHeatmap() {
 
 // cal api and display scanpath
 async function generateScanpath() {
+  loadingScanpathState = true;
   generateBtn.innerHTML = `<span class='loading'></span>`;
   try {
     const formData = new FormData();
@@ -378,8 +396,10 @@ async function generateScanpath() {
 
     addHeatmapOrScanpathImage("scanpath");
 
+    loadingScanpathState = false;
     generateBtn.innerHTML = "Try again";
   } catch (error) {
+    loadingScanpathState = false;
     updataGenerateBtnText();
     console.log(error);
   }
@@ -410,16 +430,7 @@ generateBtn.addEventListener("click", () => {
   if (images.innerHTML === "") {
     displayError("please Upload an image first");
   } else if (generateBtn.innerHTML === "Try again") {
-    images.innerHTML = "";
-    images.style.display = "none";
-    closeBtn.style.display = "none";
-    upload.style.display = "flex";
-    imageFile.value = "";
-    selectedImage = null;
-    selectedHeatmap3s = null;
-    selectedHeatmap7s = null;
-    selectedScanpath = null;
-    updataGenerateBtnText();
+    updateContainerWhenCloseOrTryagain();
   } else {
     if (selectedTab === "heatmap") {
       generateHeatmap();
