@@ -206,7 +206,10 @@ closeBtn.addEventListener("click", () => {
   closeBtn.style.display = "none";
   upload.style.display = "flex";
   imageFile.value = "";
-  selectedImage = "";
+  selectedImage = null;
+  selectedHeatmap3s = null;
+  selectedHeatmap7s = null;
+  selectedScanpath = null;
   updataGenerateBtnText();
 });
 

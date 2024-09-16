@@ -124,48 +124,34 @@ themeContainer.addEventListener("click", () => {
   changeIcon();
 });
 
+// slider
 
-/* slider */
-document.querySelector('.slider').addEventListener('mousedown', function(e) {
-  document.addEventListener('mousemove', moveSlider);
-  document.addEventListener('mouseup', function() {
-      document.removeEventListener('mousemove', moveSlider);
+const slider = document.querySelector(".home .container .slider");
+const container = document.querySelector(".home .container .image");
+const topImage = document.querySelector(".home .container .image .top-image");
+
+slider.addEventListener("mousedown", (e) => {
+  selectedSlider = e.target;
+  document.addEventListener("mousemove", moveSlider);
+  document.addEventListener("mouseup", () => {
+    document.removeEventListener("mousemove", moveSlider);
   });
 });
 
-function moveSlider(event) {
-  const container = document.querySelector('.image-wrapper');
-  const slider = document.querySelector('.slider');
-  const topImage = document.querySelector('.image-top');
-  const bottomImage = document.querySelector('.image-bottom');
-
+function moveSlider(e) {
   const containerRect = container.getBoundingClientRect();
-  const x = event.clientX - containerRect.left;
-
-  // Set the position of the slider
-  slider.style.left = `${x}px`;
-
-  // Clip the top image based on the slider position
-  topImage.style.clipPath = `inset(0 0 0 ${x}px)`;
-}
-function moveSlider(event) {
-  const container = document.querySelector('.image-wrapper');
-  const slider = document.querySelector('.slider');
-  const topImage = document.querySelector('.image-top');
-
-  const containerRect = container.getBoundingClientRect();
-  let x = event.clientX - containerRect.left;
+  let x = containerRect.right - e.clientX;
 
   // Ensure the slider does not go outside the container
   if (x < 0) {
-      x = 0; // Prevent moving outside the left boundary
+    x = 0; // Prevent moving outside the left boundary
   } else if (x > containerRect.width) {
-      x = containerRect.width; // Prevent moving outside the right boundary
+    x = containerRect.width;
   }
 
   // Set the position of the slider
-  slider.style.left = `${x}px`;
+  slider.style.right = `${x}px`;
 
   // Clip the top image based on the slider position
-  topImage.style.clipPath = `inset(0 0 0 ${x}px)`;
+  topImage.style.clipPath = `inset(0 ${x}px 0 0)`;
 }

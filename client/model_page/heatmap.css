@@ -27,6 +27,22 @@ body[data-theme="dark"] {
   color: white;
 }
 
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--main-color);
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+
 ul {
   list-style: none;
 }
@@ -381,8 +397,6 @@ header {
   height: 23px;
   cursor: pointer;
   box-shadow: inset 0px 0px 4px gray;
-
-
 
   .theme {
     position: absolute;
