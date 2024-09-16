@@ -372,7 +372,7 @@ header {
 .theme-container {
   position: relative;
   transition: all 0.3s linear;
-  border: 2px solid rgb(61, 60, 60);
+  border: 2px solid rgba(62, 57, 57, 0.571);
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -380,6 +380,9 @@ header {
   width: 46px;
   height: 23px;
   cursor: pointer;
+  box-shadow: inset 0px 0px 4px gray;
+
+
 
   .theme {
     position: absolute;
