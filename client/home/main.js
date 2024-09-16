@@ -123,3 +123,49 @@ themeContainer.addEventListener("click", () => {
   }
   changeIcon();
 });
+
+
+/* slider */
+document.querySelector('.slider').addEventListener('mousedown', function(e) {
+  document.addEventListener('mousemove', moveSlider);
+  document.addEventListener('mouseup', function() {
+      document.removeEventListener('mousemove', moveSlider);
+  });
+});
+
+function moveSlider(event) {
+  const container = document.querySelector('.image-wrapper');
+  const slider = document.querySelector('.slider');
+  const topImage = document.querySelector('.image-top');
+  const bottomImage = document.querySelector('.image-bottom');
+
+  const containerRect = container.getBoundingClientRect();
+  const x = event.clientX - containerRect.left;
+
+  // Set the position of the slider
+  slider.style.left = `${x}px`;
+
+  // Clip the top image based on the slider position
+  topImage.style.clipPath = `inset(0 0 0 ${x}px)`;
+}
+function moveSlider(event) {
+  const container = document.querySelector('.image-wrapper');
+  const slider = document.querySelector('.slider');
+  const topImage = document.querySelector('.image-top');
+
+  const containerRect = container.getBoundingClientRect();
+  let x = event.clientX - containerRect.left;
+
+  // Ensure the slider does not go outside the container
+  if (x < 0) {
+      x = 0; // Prevent moving outside the left boundary
+  } else if (x > containerRect.width) {
+      x = containerRect.width; // Prevent moving outside the right boundary
+  }
+
+  // Set the position of the slider
+  slider.style.left = `${x}px`;
+
+  // Clip the top image based on the slider position
+  topImage.style.clipPath = `inset(0 0 0 ${x}px)`;
+}
