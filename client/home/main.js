@@ -109,7 +109,6 @@ if (localStorage.getItem("theme")) {
 }
 
 themeContainer.addEventListener("click", () => {
-  console.log(document.body.dataset.theme === "light");
   if (
     document.body.dataset.theme === "light" ||
     document.body.dataset.theme === undefined
