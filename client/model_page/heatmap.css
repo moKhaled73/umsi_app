@@ -624,6 +624,7 @@ main .model .container {
   .images {
     display: none;
     padding: 10px;
+    align-items: center;
     gap: 60px;
 
     .divider {

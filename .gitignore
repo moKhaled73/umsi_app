@@ -1,3 +1,4 @@
 server/models/umsi-3s.h5
+server/models/umsi-3s-new.h5
 server/models/umsi-7s.h5
 server/weights/generator_PathGAN++.h5

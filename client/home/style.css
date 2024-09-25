@@ -46,6 +46,10 @@ body {
   font-family: system-ui;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 .theme-container {
   position: relative;
   display: inline-block;
@@ -77,10 +81,6 @@ body {
 
 .fa-moon.move {
   transform: translate(0px, 0px) rotate(-360deg);
-}
-
-html {
-  scroll-behavior: smooth;
 }
 
 /*start header*/
