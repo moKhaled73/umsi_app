@@ -34,11 +34,13 @@ body[data-theme="dark"] {
 ::-webkit-scrollbar-track {
   background-color: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background-color: var(--main-color);
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
 }
+
 ::-webkit-scrollbar-corner {
   background-color: transparent;
 }
@@ -98,6 +100,7 @@ header {
     font-size: 20px;
   }
 }
+
 .head {
   display: flex;
   justify-content: center;
@@ -172,6 +175,7 @@ header {
   transition: all 0.3s ease-in-out;
   transform: scale(1.1);
 }
+
 @media (max-width: 1200px) {
   .buttons {
     gap: 4px;
@@ -246,6 +250,7 @@ header {
     }
   }
 }
+
 /* navigations */
 .links {
   position: fixed;
@@ -303,6 +308,7 @@ header {
     color: white;
   }
 }
+
 /*
 .links {
   
@@ -414,6 +420,7 @@ header {
     transform: translate(0px, 0px) rotate(-360deg);
   }
 }
+
 /* dispaly menu icon */
 .menu {
   display: none;
@@ -613,12 +620,29 @@ main .model .container {
       cursor: pointer;
     }
 
+    .phase {
+      text-align: center;
+
+      i {
+        color: #777;
+        font-size: 45px;
+      }
+    }
+
     p {
+      padding-top: 30px;
+      font-size: 20px;
+      font-style: italic;
+      font-weight: bold;
+      color: #77777798;
+    }
+
+    /* p {
       font-size: 25px;
       font-style: italic;
       font-weight: bold;
       color: #777;
-    }
+    }*/
   }
 
   .images {
@@ -631,8 +655,9 @@ main .model .container {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 1.5px;
-      height: 80%;
+      width: 2px;
+      height: 97%;
+      /*height:80%*/
       background: var(--main-color);
       display: block;
     }
@@ -736,6 +761,7 @@ main .model .container {
   main .model .container .images {
     flex-direction: column;
   }
+
   main .model .container .images .divider {
     left: 0;
     top: 50%;
@@ -788,9 +814,11 @@ main .generate {
   main .model .container {
     width: 100%;
   }
+
   main .model .container .images {
     width: 100%;
   }
+
   main .model .container .images .image {
     width: 100% !important;
   }
@@ -823,6 +851,7 @@ main .generate {
   justify-content: center;
   z-index: 1000;
   background-color: rgba(0, 0, 0, 0.3);
+
   .container {
     background-color: #fff;
     color: black;
