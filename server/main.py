@@ -1,23 +1,27 @@
-# Let's break down the provided code and create the necessary FastAPI and HTML components to integrate the model.
-# The key functions we'll use are `process_image_with_model`, which processes an image using the model and saves the output.
-# We'll need to modify the FastAPI application to handle image uploads, pass the image to the model for processing, save the output,
-# and then display the result on the webpage.
-
-# First, here's the modified FastAPI application and HTML code that incorporates the model:
-
-## FastAPI Script (`main.py`):
-
-from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import StreamingResponse
-from fastapi.middleware.cors import CORSMiddleware
-from PIL import Image, ImageOps
-import io
 import os
+import io
+import sys
+import time
+import json
 import glob
+import cv2
+import torch
+import pickle
+import open_clip
 import numpy as np
+import pandas as pd
 import tensorflow as tf
 import matplotlib.pyplot as plt
-import cv2
+from PIL import Image, ImageOps
+from sentence_transformers import util
+from skimage import metrics
+
+
+from fastapi import FastAPI, File, UploadFile, Form
+from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
+
+import google.generativeai as genai
 
 from predict_csv import predict_and_save
 from generate_predicted_results import generate_raw_predicted_results
@@ -25,14 +29,87 @@ from subsample_seq import subsample_seq
 from apply_scanpath_to_images import apply_scanpath_to_images
 from utils import delete_all_files_in_folder
 
+dataset_path = "./uicrit/uicrit_public.csv"
+images_folder_path = "./uicrit/filtered_unique_uis/filtered_unique_uis"
+encoded_path = './uicrit/encoded_images.pkl'
+core_path = './uicrit/'
+
+sys.path.append(core_path)
+
+# Now you can import your modules
+from core.functions import *
+from core.entities import *
+from core.similarity_model import *
+
+df = pd.read_csv(dataset_path)
+data, data_dict = createUICritData(df)
 
 
 # Load the model when the script is initialized
 heatmap3s_weights = 'models/umsi-3s.h5'
 heatmap7s_weights = 'models/umsi-7s.h5'
-heatmap3s_model = tf.keras.models.load_model(heatmap3s_weights)
-heatmap7s_model = tf.keras.models.load_model(heatmap7s_weights)
+# heatmap3s_model = tf.keras.models.load_model(heatmap3s_weights)
+# heatmap7s_model = tf.keras.models.load_model(heatmap7s_weights)
 
+def getResponse(input_image, few_shot_images, few_shot_tasks, guidelines):
+    print("hello")
+    # Dynamically generate task descriptions from few_shot_tasks
+    tasks_description = ""
+    for i, task in enumerate(few_shot_tasks):
+        tasks_description += f"tasks for image {i + 1}: {task}. "
+
+    # Refined prompt to emphasize the accuracy of bounding boxes
+    prompt = (
+        f"Analyze the style of the {tasks_description}"
+        f"Using this style and following the {guidelines}, generate new recommendations that fit image three in the same format but are specific to the third image. "
+        "For each recommendation, provide an accurate bounding box in the format [x1, y1, x2, y2] that matches the area of the image the recommendation refers to. "
+        "Ensure that the bounding box is accurate and aligned with the described issue in the image. "
+        "Return the response as plain text without any formatting like JSON, code blocks, or other structured data formats."
+    )
+
+    # Generate response using the model
+    response = model.generate_content([prompt] + few_shot_images + [ input_image])
+
+    # Extract and print the text part of the response
+    response_text = response._result.candidates[0].content.parts[0].text
+    return response_text
+
+def get_few_shot(visiual_similarities_df, num_few_shot):
+    few_shot_images = []
+    for i in range(num_few_shot):
+        print(visiual_similarities_df.iloc[i, 1])
+        img = Image.open(os.path.join(images_folder_path, visiual_similarities_df.iloc[i, 0]))
+        few_shot_images.append(img)
+        
+    few_shot_tasks = []
+    for i in range(num_few_shot):
+        rico_id = visiual_similarities_df.iloc[i, 0].split('.')[0]
+        task = json.dumps([t.to_json() for t in data_dict[int(rico_id)].tasks])
+        few_shot_tasks.append(task)
+    
+    few_shot_comments = []  # List to store the comments for each few-shot image
+    for i in range(num_few_shot):
+        # Get the rico_id from the visual similarities DataFrame
+        rico_id = visiual_similarities_df.iloc[i, 0].split('.')[0]
+        
+        # Get the tasks for the corresponding rico_id from the data_dict
+        tasks = data_dict[int(rico_id)].tasks
+        
+        # Prepare a list to store all comments for the tasks
+        comments_dict = []
+        
+        # Loop through each task to collect its comments
+        for task in tasks:
+            for comment in task.comments:
+                comments_dict.append(comment.to_json())  # Use to_json() method if available
+        
+        # Encode the entire list of comments to JSON format
+        comment_json = json.dumps(comments_dict)
+        
+        # Append the JSON-encoded comments to the few_shot_comments list
+        few_shot_comments.append(comment_json)
+
+    return few_shot_images, few_shot_tasks, few_shot_comments
 
 def padding(img, shape_r, shape_c, channels=3):
     img_padded = np.zeros((shape_r, shape_c, channels), dtype=np.uint8)
@@ -134,6 +211,8 @@ def resize_heatmap_to_original_image(heatmap, original_image):
 
 
 app = FastAPI()
+
+# fastapi middlewares
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],  # Allows the specified origins
@@ -142,7 +221,10 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
+genai.configure(api_key="AIzaSyCsnFKo_eNQC_FXS6ImzO_2pjXPlF5XlhY")
+model = genai.GenerativeModel("gemini-1.5-flash")
 
+# heatmap 3s route
 @app.post("/heatmap3s/upload")
 async def upload_image(file: UploadFile = File(...)):
     
@@ -171,6 +253,8 @@ async def upload_image(file: UploadFile = File(...)):
     
     return StreamingResponse(img_bytes, media_type="image/png")
 
+
+# heatmap 7s route
 @app.post("/heatmap7s/upload")
 async def upload_image(file: UploadFile = File(...)):
     
@@ -199,7 +283,7 @@ async def upload_image(file: UploadFile = File(...)):
     
     return StreamingResponse(img_bytes, media_type="image/png")
 
-
+# scanpath route
 @app.post("/scanpath/upload")
 async def upload_image(file: UploadFile = File(...)):
     
@@ -225,6 +309,42 @@ async def upload_image(file: UploadFile = File(...)):
 
     return StreamingResponse(img_bytes, media_type="image/png")
 
-@app.get("/")
-def root():
-    return {"hello": "world"}
+
+# generate ui recommendations
+@app.post("/generate_ui_recommendations")
+async def generate_ui_recommendations(image: UploadFile = File(...), prompt: str = Form(...)):
+    try:
+        image_content = await image.read()
+
+        # Convert binary data to a PIL Image
+        image_pil = Image.open(io.BytesIO(image_content))
+
+        # Convert the PIL Image to a NumPy array (buffer array)
+        image_array = np.array(image_pil)
+
+
+        response = model.generate_content([prompt, image_pil])
+        return {"recommendations": response.text}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/our_recommendations")
+async def our_recommendations(image: UploadFile = File(...)):
+    
+    image_content = await image.read()
+
+    # Convert binary data to a PIL Image
+    image_pil = Image.open(io.BytesIO(image_content))
+
+    # Convert the PIL Image to a NumPy array (buffer array)
+    image_array = np.array(image_pil)
+
+    visiual_similarities_df = getSimilarImages(images_folder_path, image_array , encoded_path)
+
+    few_shot_images, few_shot_tasks, few_shot_comments =  get_few_shot(visiual_similarities_df, 4)
+
+    response = getResponse(image_pil, few_shot_images, few_shot_tasks, "Human Interface Guidelines")
+
+    response_json = json.loads(response)
+    return {"recommendations": response_json}

@@ -2,3 +2,6 @@ server/models/umsi-3s.h5
 server/models/umsi-3s-new.h5
 server/models/umsi-7s.h5
 server/weights/generator_PathGAN++.h5
+server/uicrit/filtered_unique_uis
+server/uicrit/encoded_images.pkl
+server/uicrit/image_features.pkl
