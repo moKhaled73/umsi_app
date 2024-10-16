@@ -52,19 +52,19 @@ heatmap7s_weights = 'models/umsi-7s.h5'
 # heatmap7s_model = tf.keras.models.load_model(heatmap7s_weights)
 
 def getResponse(input_image, few_shot_images, few_shot_tasks, guidelines):
-    print("hello")
     # Dynamically generate task descriptions from few_shot_tasks
     tasks_description = ""
     for i, task in enumerate(few_shot_tasks):
         tasks_description += f"tasks for image {i + 1}: {task}. "
 
-    # Refined prompt to emphasize the accuracy of bounding boxes
     prompt = (
-        f"Analyze the style of the {tasks_description}"
-        f"Using this style and following the {guidelines}, generate new recommendations that fit image three in the same format but are specific to the third image. "
+        f"The input image is the first image, followed by few-shot images. "
+        f"Analyze the style of the {tasks_description} "
+        f"Using this style and following the {guidelines}, generate new recommendations that fit the input image (the first image) in the same format, but are specific to the input image. "
         "For each recommendation, provide an accurate bounding box in the format [x1, y1, x2, y2] that matches the area of the image the recommendation refers to. "
         "Ensure that the bounding box is accurate and aligned with the described issue in the image. "
-        "Return the response as plain text without any formatting like JSON, code blocks, or other structured data formats."
+        "Do not repeat any comment or recommendation that has already been suggested earlier in this response. "
+        "Return the response in pure JSON format with no introduction, comments, or additional text."
     )
 
     # Generate response using the model
@@ -77,7 +77,6 @@ def getResponse(input_image, few_shot_images, few_shot_tasks, guidelines):
 def get_few_shot(visiual_similarities_df, num_few_shot):
     few_shot_images = []
     for i in range(num_few_shot):
-        print(visiual_similarities_df.iloc[i, 1])
         img = Image.open(os.path.join(images_folder_path, visiual_similarities_df.iloc[i, 0]))
         few_shot_images.append(img)
         
@@ -344,7 +343,7 @@ async def our_recommendations(image: UploadFile = File(...)):
 
     few_shot_images, few_shot_tasks, few_shot_comments =  get_few_shot(visiual_similarities_df, 4)
 
-    response = getResponse(image_pil, few_shot_images, few_shot_tasks, "Human Interface Guidelines")
-
+    response = getResponse(image_pil, few_shot_images, few_shot_comments , "Human Interface Guidelines")
     response_json = json.loads(response)
-    return {"recommendations": response_json}
+    comments_from_json = [Comment.from_json(comment) for comment in response_json]
+    return {"recommendations": comments_from_json}
