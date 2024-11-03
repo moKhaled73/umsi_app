@@ -48,8 +48,8 @@ data, data_dict = createUICritData(df)
 # Load the model when the script is initialized
 heatmap3s_weights = 'models/umsi-3s.h5'
 heatmap7s_weights = 'models/umsi-7s.h5'
-# heatmap3s_model = tf.keras.models.load_model(heatmap3s_weights)
-# heatmap7s_model = tf.keras.models.load_model(heatmap7s_weights)
+heatmap3s_model = tf.keras.models.load_model(heatmap3s_weights)
+heatmap7s_model = tf.keras.models.load_model(heatmap7s_weights)
 
 def getResponse(input_image, few_shot_images, few_shot_tasks, guidelines):
     # Dynamically generate task descriptions from few_shot_tasks
@@ -321,6 +321,7 @@ async def generate_ui_recommendations(image: UploadFile = File(...), prompt: str
         # Convert the PIL Image to a NumPy array (buffer array)
         image_array = np.array(image_pil)
 
+        prompt = "Provide UI recommendations to enhance this design based on the following prompt:" + prompt
 
         response = model.generate_content([prompt, image_pil])
         return {"recommendations": response.text}
@@ -329,7 +330,7 @@ async def generate_ui_recommendations(image: UploadFile = File(...), prompt: str
 
 
 @app.post("/our_recommendations")
-async def our_recommendations(image: UploadFile = File(...)):
+async def our_recommendations(image: UploadFile = File(...), guideline: str = Form(...)):
     
     image_content = await image.read()
 
@@ -341,9 +342,9 @@ async def our_recommendations(image: UploadFile = File(...)):
 
     visiual_similarities_df = getSimilarImages(images_folder_path, image_array , encoded_path)
 
-    few_shot_images, few_shot_tasks, few_shot_comments =  get_few_shot(visiual_similarities_df, 4)
+    few_shot_images, few_shot_tasks, few_shot_comments =  get_few_shot(visiual_similarities_df, 2)
 
-    response = getResponse(image_pil, few_shot_images, few_shot_comments , "Human Interface Guidelines")
+    response = getResponse(image_pil, few_shot_images, few_shot_comments , guideline)
     response_json = json.loads(response)
     comments_from_json = [Comment.from_json(comment) for comment in response_json]
     return {"recommendations": comments_from_json}
