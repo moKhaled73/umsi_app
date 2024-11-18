@@ -51,6 +51,32 @@ heatmap7s_weights = 'models/umsi-7s.h5'
 heatmap3s_model = tf.keras.models.load_model(heatmap3s_weights)
 heatmap7s_model = tf.keras.models.load_model(heatmap7s_weights)
 
+
+
+def extract_json_response(response: str) -> list:
+    start_flag = "START_JSON_RESPONSE"
+    end_flag = "END_JSON_RESPONSE"
+
+    try:
+        # Extract text between flags
+        json_text = response.split(start_flag)[1].split(end_flag)[0].strip()
+
+        # Remove ````json` if present
+        json_text = json_text.replace("```json", "").replace("```", "").strip()
+
+        # Finding the beginning and end of the JSON
+        json_start = min(json_text.find("{"), json_text.find("["))
+        json_end = max(json_text.rfind("}"), json_text.rfind("]"))
+
+        # Trim text to get JSON only
+        clean_json = json_text[json_start:json_end + 1]
+
+        return clean_json
+
+    except (IndexError, json.JSONDecodeError) as e:
+        print("Error extracting JSON:", e)
+        return '[]'
+
 def getResponse(input_image, few_shot_images, few_shot_tasks, guidelines):
     # Dynamically generate task descriptions from few_shot_tasks
     tasks_description = ""
@@ -64,7 +90,7 @@ def getResponse(input_image, few_shot_images, few_shot_tasks, guidelines):
         "For each recommendation, provide an accurate bounding box in the format [x1, y1, x2, y2] that matches the area of the image the recommendation refers to. "
         "Ensure that the bounding box is accurate and aligned with the described issue in the image. "
         "Do not repeat any comment or recommendation that has already been suggested earlier in this response. "
-        "Return the response in pure JSON format with no introduction, comments, or additional text."
+         "Return the response enclosed within special flags: START_JSON_RESPONSE and END_JSON_RESPONSE without any additional text or comments."
     )
 
     # Generate response using the model
@@ -345,6 +371,6 @@ async def our_recommendations(image: UploadFile = File(...), guideline: str = Fo
     few_shot_images, few_shot_tasks, few_shot_comments =  get_few_shot(visiual_similarities_df, 2)
 
     response = getResponse(image_pil, few_shot_images, few_shot_comments , guideline)
-    response_json = json.loads(response)
+    response_json = json.loads(extract_json_response(response))
     comments_from_json = [Comment.from_json(comment) for comment in response_json]
     return {"recommendations": comments_from_json}
